@@ -149,14 +149,14 @@ void sendfirst()
 	assert(send_fifo != 0);
     assert(write(send_fifo, m1, m1->size) == m1->size);
 }
-void send()
+inline void send()
 {
     assert(write(send_fifo, m1, m1->size) == m1->size);
 }
 
 static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 static int messageLen = sizeof(Message);
-void recv()
+inline void recv()
 {
     assert(read(recv_fifo, m, messageLen) == messageLen);
     payload_size = m->payload_size();
@@ -183,11 +183,11 @@ int main()
     	m1 = next_message();
         if (m1)
         {
-            std::cout<<"alice send m1="<<m1<<std::endl;
+            //std::cout<<"alice send m1="<<m1<<std::endl;
 	    sendfirst();
             recvfirst();
 	    record(m);
-	    std::cout<<"alice recv m="<<m<<std::endl;
+	    //std::cout<<"alice recv m="<<m<<std::endl;
 	    break;
         }
         else
@@ -203,12 +203,8 @@ int main()
         if (m1)
         {
             //std::cout<<"alice send m1="<<m1<<std::endl;
-	    //send();
-	    assert(write(send_fifo, m1, m1->size) == m1->size);
-            //recv();
-	    assert(read(recv_fifo, m, messageLen) == messageLen);
-	    payload_size = m->payload_size();
-	    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+	    send();
+            recv();
 	    record(m);
 	    //std::cout<<"alice recv m="<<m<<std::endl;
         }
