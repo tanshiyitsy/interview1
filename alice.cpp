@@ -213,13 +213,13 @@ int main()
         if (m1)
         {
              //memcpy(m, m1, m1->size);
-            std::cout<<"alice send m1="<<m1<<std::endl;
+            //std::cout<<"alice send m1="<<m1<<std::endl;
             send(m1);
 // 	    const Message *m2 = recv();
 //             record(m2);
             recv();
 	    record(m);
-	    std::cout<<"alice recv m="<<m<<std::endl;
+	    //std::cout<<"alice recv m="<<m<<std::endl;
         }
         else
         {
