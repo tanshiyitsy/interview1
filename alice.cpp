@@ -200,20 +200,20 @@ void recv()
     //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
-    return m;
+    //return m;
 }
-
 
 int main()
 {
     cout<<"alice start..."<<endl;;
     while (true)
     {
-        const Message *m1 = next_message();
+//         const Message *m1 = next_message();
+	    m = next_message();
         if (m1)
         {
             //std::cout<<"send m1="<<m1<<std::endl;
-            send(m1);
+            send();
 //             const Message *m2 = recv();
 	    recv();
             record(m);
