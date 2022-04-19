@@ -7,7 +7,7 @@ static int recv_fifo = 0;
 static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 static int messageLen = sizeof(Message);
 static int payload_size = 0;
-void send()
+inline void send()
 {
     assert(write(send_fifo, m, m->size) == m->size);
 }
@@ -33,7 +33,7 @@ void recvfirst()
     payload_size = m->payload_size();
     assert(read(recv_fifo, m->payload, payload_size) == payload_size);
 }
-void recv()
+inline void recv()
 {
     assert(read(recv_fifo, m, messageLen) == messageLen);
     payload_size = m->payload_size();
@@ -51,16 +51,12 @@ int main()
 
     while (true)
     {
-	//recv();
-	assert(read(recv_fifo, m, messageLen) == messageLen);
-        payload_size = m->payload_size();
-        assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+	recv();
 	//cout<<"bob recv"<<m<<endl;
         assert(m->checksum == crc32(m));
         m->payload[0]++;         // 第一个字符加一
         m->checksum = crc32(m); // 更新校验和
-	//send();
-	assert(write(send_fifo, m, m->size) == m->size);
+	send();
 	//cout<<"bob send"<<m<<endl;
     }
 
