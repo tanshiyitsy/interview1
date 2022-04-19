@@ -137,41 +137,7 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static int send_fifo = 0;
 static int recv_fifo = 0;
-// void send(const Message *message)
-// {
-//     //static int fifo = 0;
-//     if (send_fifo == 0)
-//     {
-//         const char *filename = "alice_to_bob";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-// 	send_fifo = open(filename, O_WRONLY);
-// 	cout << "send_fifo=" << send_fifo << endl;
-//         assert(send_fifo != 0);
-//     }
-//     assert(write(send_fifo, message, message->size) == message->size);
-// }
-
-// static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-// const Message *recv()
-// {
-//     static int recv_fifo = 0;
-//     if (recv_fifo == 0)
-//     {
-//         const char *filename = "bob_to_alice";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-// 	recv_fifo = open(filename, O_RDONLY);
-// 	cout << "recv_fifo=" << recv_fifo << endl;
-//         assert(recv_fifo != 0);
-//     }
-//     //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-//     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
-//     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
-//     return m;
-// }
-static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-void send()
+void send(const Message *message)
 {
     //static int fifo = 0;
     if (send_fifo == 0)
@@ -183,9 +149,11 @@ void send()
 	cout << "send_fifo=" << send_fifo << endl;
         assert(send_fifo != 0);
     }
-    assert(write(send_fifo, m, m->size) == m->size);
+    assert(write(send_fifo, message, message->size) == message->size);
 }
-void recv()
+
+static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
+const Message *recv()
 {
     static int recv_fifo = 0;
     if (recv_fifo == 0)
@@ -200,8 +168,9 @@ void recv()
     //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
-    //return m;
+    return m;
 }
+
 
 int main()
 {
@@ -211,13 +180,11 @@ int main()
         const Message *m1 = next_message();
         if (m1)
         {
-             memcpy(m, m1, m1->size);
+             //memcpy(m, m1, m1->size);
             //std::cout<<"send m1="<<m1<<std::endl;
-            send();
-//          const Message *m2 = recv();
-            memset(m,0,MESSAGE_SIZES[4]);
-	    recv();
-            record(m);
+            send(m1);
+	    const Message *m2 = recv();
+            record(m2);
         }
         else
         {
