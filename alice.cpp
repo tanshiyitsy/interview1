@@ -142,7 +142,7 @@ void openfifo(){
     while(access(filename, F_OK))
         mkfifo(filename, 0666);
     cout<<"alice start2..."<<endl;
-    fifo = open(filename, O_WRONLY|O_RDONLY);
+    fifo = open(filename, O_RDWR|O_NONBLOCK);
     cout<<"alice start3..."<<endl;
     assert(fifo != 0);
 }
