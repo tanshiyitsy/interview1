@@ -139,19 +139,6 @@ static int send_fifo = 0;
 static int recv_fifo = 0;
 static const Message *m1 = nullptr;
 static int payload_size = 0;
-// void send(const Message *message)
-// {
-//     if (send_fifo == 0)
-//     {
-//         const char *filename = "alice_to_bob";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-// 	send_fifo = open(filename, O_WRONLY);
-// 	cout << "send_fifo=" << send_fifo << endl;
-//         assert(send_fifo != 0);
-//     }
-//     assert(write(send_fifo, message, message->size) == message->size);
-// }
 void send()
 {
     if (send_fifo == 0)
@@ -188,14 +175,12 @@ void recv()
 int main()
 {
     cout<<"alice start..."<<endl;
-//     const Message *m1 = nullptr;
     while (true)
     {
         m1 = next_message();
         if (m1)
         {
             std::cout<<"alice send m1="<<m1<<std::endl;
-//             send(m1);
 	    send();
             recv();
 	    record(m);
