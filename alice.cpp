@@ -214,7 +214,8 @@ int main()
              memcpy(m, m1, m1->size);
             //std::cout<<"send m1="<<m1<<std::endl;
             send();
-//             const Message *m2 = recv();
+//          const Message *m2 = recv();
+            memset(m,0,MESSAGE_SIZES[4]);
 	    recv();
             record(m);
         }
