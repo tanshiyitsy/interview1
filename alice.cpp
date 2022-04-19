@@ -208,10 +208,10 @@ int main()
     cout<<"alice start..."<<endl;;
     while (true)
     {
-//         const Message *m1 = next_message();
-	    m = next_message();
+        const Message *m1 = next_message();
         if (m1)
         {
+             memcpy(m, m1, m1->size);
             //std::cout<<"send m1="<<m1<<std::endl;
             send();
 //             const Message *m2 = recv();
