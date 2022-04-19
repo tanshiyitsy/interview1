@@ -6,6 +6,7 @@ static int send_fifo = 0;
 static int recv_fifo = 0;
 static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 static int messageLen = sizeof(Message);
+static int payload_size = 0;
 void send()
 {
     if (send_fifo == 0)
@@ -32,7 +33,8 @@ void recv()
         assert(recv_fifo != 0);
     }
     assert(read(recv_fifo, m, messageLen) == messageLen);
-    assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
+    payload_size = m->payload_size();
+    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
 }
 
 int main()
