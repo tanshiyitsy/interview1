@@ -138,6 +138,7 @@ void record(const Message *m)
 static int send_fifo = 0;
 static int recv_fifo = 0;
 static const Message *m1 = nullptr;
+static int payload_size = 0;
 // void send(const Message *message)
 // {
 //     if (send_fifo == 0)
@@ -179,7 +180,8 @@ void recv()
         assert(recv_fifo != 0);
     }
     assert(read(recv_fifo, m, messageLen) == messageLen);
-    assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
+    payload_size = m->payload_size();
+    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
 }
 
 
