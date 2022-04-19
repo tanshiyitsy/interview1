@@ -64,7 +64,7 @@ void recv()
 	cout << "recv_fifo=" << recv_fifo << endl;
         assert(recv_fifo != 0);
     }
-    static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
+    //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
 //     return m;
