@@ -43,6 +43,7 @@ const Message *recv()
 
 int main()
 {
+    cout<<"bob start..."<<endl;
     openfifo();
     cout<<"openfile="<<fifo<<endl;
     Message *m2 = (Message *)malloc(MESSAGE_SIZES[4]);
