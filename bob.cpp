@@ -4,12 +4,6 @@ using namespace std;
 
 static int send_fifo = 0;
 static int recv_fifo = 0;
-
-
-static int send_fifo = 0;
-static int recv_fifo = 0;
-static int send_fifo = 0;
-static int recv_fifo = 0;
 void send(const Message *message)
 {
     //static int send_fifo = 0;
