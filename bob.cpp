@@ -83,10 +83,12 @@ int main()
 //         m2->checksum = crc32(m2); // 更新校验和
 // 	send(m2);
 	recv();
+	cout<<"bob recv"<<m<<endl;
         assert(m->checksum == crc32(m));
         m->payload[0]++;         // 第一个字符加一
         m->checksum = crc32(m); // 更新校验和
 	send();
+	cout<<"bob send"<<m<<endl;
     }
 
     return 0;
