@@ -84,6 +84,7 @@ int main()
         //m2->payload[0]++;         // 第一个字符加一
         //m2->checksum = crc32(m2); // 更新校验和
 // 	  send(m2);
+	memset(m,0,MESSAGE_SIZES[4]);
 	recv();
 	m->payload[0]++;
 	m->checksum = crc32(m2);
