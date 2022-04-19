@@ -177,6 +177,7 @@ const Message *recv()
 
 int main()
 {
+    cout<<"alice start..."<<endl;
     openfifo();
     cout<<"openfile="<<fifo<<endl;
     while (true)
