@@ -1,5 +1,5 @@
 #include "common.h"
-
+using namespace std;
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 
 /*
@@ -134,7 +134,7 @@ void record(const Message *m)
 }
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
-using namespace std;
+
 void send(const Message *message)
 {
     static int fifo = 0;
