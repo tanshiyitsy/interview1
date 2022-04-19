@@ -219,7 +219,7 @@ int main()
 //             record(m2);
             recv();
 	    record(m);
-	    std::cout<<"alice recv m2="<<m2<<std::endl;
+	    std::cout<<"alice recv m="<<m<<std::endl;
         }
         else
         {
