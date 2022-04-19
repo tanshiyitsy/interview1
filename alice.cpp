@@ -202,7 +202,7 @@ int main()
         m1 = next_message();
         if (m1)
         {
-            std::cout<<"alice send m1="<<m1<<std::endl;
+            //std::cout<<"alice send m1="<<m1<<std::endl;
 	    //send();
 	    assert(write(send_fifo, m1, m1->size) == m1->size);
             //recv();
@@ -210,7 +210,7 @@ int main()
 	    payload_size = m->payload_size();
 	    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
 	    record(m);
-	    std::cout<<"alice recv m="<<m<<std::endl;
+	    //std::cout<<"alice recv m="<<m<<std::endl;
         }
         else
         {
