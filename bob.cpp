@@ -51,12 +51,16 @@ int main()
 
     while (true)
     {
-	recv();
+	//recv();
+	assert(read(recv_fifo, m, messageLen) == messageLen);
+    payload_size = m->payload_size();
+    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
 	cout<<"bob recv"<<m<<endl;
         assert(m->checksum == crc32(m));
         m->payload[0]++;         // 第一个字符加一
         m->checksum = crc32(m); // 更新校验和
-	send();
+	//send();
+	assert(write(send_fifo, m, m->size) == m->size);
 	cout<<"bob send"<<m<<endl;
     }
 
