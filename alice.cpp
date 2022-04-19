@@ -137,8 +137,21 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static int send_fifo = 0;
 static int recv_fifo = 0;
-
-void send(const Message *message)
+static const Message *m1 = nullptr;
+// void send(const Message *message)
+// {
+//     if (send_fifo == 0)
+//     {
+//         const char *filename = "alice_to_bob";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+// 	send_fifo = open(filename, O_WRONLY);
+// 	cout << "send_fifo=" << send_fifo << endl;
+//         assert(send_fifo != 0);
+//     }
+//     assert(write(send_fifo, message, message->size) == message->size);
+// }
+void send()
 {
     if (send_fifo == 0)
     {
@@ -149,7 +162,7 @@ void send(const Message *message)
 	cout << "send_fifo=" << send_fifo << endl;
         assert(send_fifo != 0);
     }
-    assert(write(send_fifo, message, message->size) == message->size);
+    assert(write(send_fifo, m1, m1->size) == m1->size);
 }
 
 static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
@@ -173,14 +186,15 @@ void recv()
 int main()
 {
     cout<<"alice start..."<<endl;
-    const Message *m1 = nullptr;
+//     const Message *m1 = nullptr;
     while (true)
     {
         m1 = next_message();
         if (m1)
         {
             std::cout<<"alice send m1="<<m1<<std::endl;
-            send(m1);
+//             send(m1);
+	    send();
             recv();
 	    record(m);
 	    std::cout<<"alice recv m="<<m<<std::endl;
