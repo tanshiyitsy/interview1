@@ -152,6 +152,7 @@ void send(const Message *message)
     assert(write(send_fifo, message, message->size) == message->size);
 }
 
+static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 const Message *recv()
 {
     static int recv_fifo = 0;
@@ -164,7 +165,7 @@ const Message *recv()
 	cout << "recv_fifo=" << recv_fifo << endl;
         assert(recv_fifo != 0);
     }
-    static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
+    //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
     return m;
@@ -173,18 +174,16 @@ const Message *recv()
 
 int main()
 {
-    cout<<"alice start..."<<endl;
-//     open_send_fifo();
-//     opend_recv_fifo();
+    cout<<"alice start..."<<endl;;
     while (true)
     {
         const Message *m1 = next_message();
         if (m1)
         {
-            std::cout<<"send m1="<<m1<<std::endl;
+            //std::cout<<"send m1="<<m1<<std::endl;
             send(m1);
             const Message *m2 = recv();
-            cout<<"recv m2="<<m2<<endl;
+            //cout<<"recv m2="<<m2<<endl;
             record(m2);
         }
         else
