@@ -9,29 +9,50 @@ static int messageLen = sizeof(Message);
 static int payload_size = 0;
 void send()
 {
-    if (send_fifo == 0)
-    {
-        const char *filename = "bob_to_alice";
-        if (access(filename, F_OK))
-            mkfifo(filename, 0666);
-	send_fifo = open(filename, O_WRONLY);
-	cout << "send_fifo=" << send_fifo << endl;
-        assert(send_fifo != 0);
-    }
+//     if (send_fifo == 0)
+//     {
+//         const char *filename = "bob_to_alice";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+// 	send_fifo = open(filename, O_WRONLY);
+// 	cout << "send_fifo=" << send_fifo << endl;
+//         assert(send_fifo != 0);
+//     }
     assert(write(send_fifo, m, m->size) == m->size);
 }
-
-void recv()
+void sendfirst()
 {
-    if (recv_fifo == 0)
-    {
-        const char *filename = "alice_to_bob";
-        if (access(filename, F_OK))
-            mkfifo(filename, 0666);
+    const char *filename = "bob_to_alice";
+	if (access(filename, F_OK))
+	    mkfifo(filename, 0666);
+	send_fifo = open(filename, O_WRONLY);
+	cout << "send_fifo=" << send_fifo << endl;
+	assert(send_fifo != 0);
+    assert(write(send_fifo, m, m->size) == m->size);
+}
+void recvfirst()
+{
+    const char *filename = "alice_to_bob";
+	if (access(filename, F_OK))
+	    mkfifo(filename, 0666);
 	recv_fifo = open(filename, O_RDONLY);
 	cout << "recv_fifo=" << recv_fifo << endl;
-        assert(recv_fifo != 0);
-    }
+	assert(recv_fifo != 0);
+    assert(read(recv_fifo, m, messageLen) == messageLen);
+    payload_size = m->payload_size();
+    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+}
+void recv()
+{
+//     if (recv_fifo == 0)
+//     {
+//         const char *filename = "alice_to_bob";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+// 	recv_fifo = open(filename, O_RDONLY);
+// 	cout << "recv_fifo=" << recv_fifo << endl;
+//         assert(recv_fifo != 0);
+//     }
     assert(read(recv_fifo, m, messageLen) == messageLen);
     payload_size = m->payload_size();
     assert(read(recv_fifo, m->payload, payload_size) == payload_size);
@@ -40,6 +61,12 @@ void recv()
 int main()
 {
     cout<<"bob start..."<<endl;
+     recvfirst();
+    assert(m->checksum == crc32(m));
+	m->payload[0]++;         // 第一个字符加一
+	m->checksum = crc32(m); // 更新校验和
+	sendfirst();
+
     while (true)
     {
 	recv();
