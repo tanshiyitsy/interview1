@@ -135,18 +135,26 @@ void record(const Message *m)
 }
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
-static int fifo = 0;
-void openfifo(){
-    cout<<"alice start1..."<<endl;
-    const char *filename = "alice_to_bob";
-    while(access(filename, F_OK))
-        mkfifo(filename, 0666);
-    cout<<"alice start2..."<<endl;
-    fifo = open(filename, O_RDWR|O_NONBLOCK);
-    cout<<"alice start3..."<<endl;
-    assert(fifo != 0);
+static int send_fifo = 0;
+static int recv_fifo = 0;
+void open_send_fifo() {
+	cout << "alice start1..." << endl;
+	const char *filename = "alice_to_bob";
+	if (access(filename, F_OK))
+		mkfifo(filename, 0666);
+	cout << "alice start2..." << endl;
+	send_fifo = open(filename, O_WRONLY);
+	cout << "send_fifo="<<send_fifo << endl;
+	assert(send_fifo != 0);
 }
-
+void opend_recv_fifo() {
+	const char *filename = "bob_to_alice";
+	if (access(filename, F_OK))
+		mkfifo(filename, 0666);
+	recv_fifo = open(filename, O_RDONLY);
+	cout << "recv_fifo=" << send_fifo << endl;
+	assert(recv_fifo != 0);
+}
 void send(const Message *message)
 {
 //     static int fifo = 0;
@@ -158,7 +166,7 @@ void send(const Message *message)
 //         fifo = open(filename, O_WRONLY);
 //         assert(fifo != 0);
 //     }
-    assert(write(fifo, message, message->size) == message->size);
+    assert(write(send_fifo, message, message->size) == message->size);
 }
 
 const Message *recv()
@@ -173,16 +181,16 @@ const Message *recv()
 //         assert(fifo != 0);
 //     }
     static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-    assert(read(fifo, m, sizeof(Message)) == sizeof(Message));
-    assert(read(fifo, m->payload, m->payload_size()) == m->payload_size());
+    assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
+    assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
     return m;
 }
 
 int main()
 {
     cout<<"alice start..."<<endl;
-    openfifo();
-    cout<<"openfile="<<fifo<<endl;
+    open_send_fifo();
+    opend_recv_fifo();
     while (true)
     {
         const Message *m1 = next_message();
