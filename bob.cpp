@@ -83,10 +83,9 @@ int main()
 //         m2->checksum = crc32(m2); // 更新校验和
 // 	send(m2);
 	recv();
-        assert(m1->checksum == crc32(m1));
-        //memcpy(m2, m1, m1->size); // 拷贝m1至m2
-        m1->payload[0]++;         // 第一个字符加一
-        m1->checksum = crc32(m1); // 更新校验和
+        assert(m->checksum == crc32(m));
+        m->payload[0]++;         // 第一个字符加一
+        m->checksum = crc32(m); // 更新校验和
 	send();
     }
 
