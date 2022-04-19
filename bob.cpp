@@ -1,31 +1,40 @@
 #include "common.h"
 #include "iostream"
 using namespace std;
+
+static int fifo = 0;
+static void openfifo(){
+    const char *filename = "bob_to_alice";
+    if (access(filename, F_OK))
+            mkfifo(filename, 0666);
+    fifo = open(filename, O_WRONLY);
+        assert(fifo != 0);
+}
 void send(const Message *message)
 {
-    static int fifo = 0;
-    if (fifo == 0)
-    {
-        const char *filename = "bob_to_alice";
-        if (access(filename, F_OK))
-            mkfifo(filename, 0666);
-        fifo = open(filename, O_WRONLY);
-        assert(fifo != 0);
-    }
+//     static int fifo = 0;
+//     if (fifo == 0)
+//     {
+//         const char *filename = "bob_to_alice";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+//         fifo = open(filename, O_WRONLY);
+//         assert(fifo != 0);
+//     }
     assert(write(fifo, message, message->size) == message->size);
 }
 
 const Message *recv()
 {
-    static int fifo = 0;
-    if (fifo == 0)
-    {
-        const char *filename = "alice_to_bob";
-        if (access(filename, F_OK))
-            mkfifo(filename, 0666);
-        fifo = open(filename, O_RDONLY);
-        assert(fifo != 0);
-    }
+//     static int fifo = 0;
+//     if (fifo == 0)
+//     {
+//         const char *filename = "alice_to_bob";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+//         fifo = open(filename, O_RDONLY);
+//         assert(fifo != 0);
+//     }
     static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(fifo, m->payload, m->payload_size()) == m->payload_size());
