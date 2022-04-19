@@ -173,10 +173,10 @@ int main()
         const Message *m1 = next_message();
         if (m1)
         {
-            cout<<"m1="<<m1<<endl;
+            cout<<"send m1="<<m1<<endl;
             send(m1);
             const Message *m2 = recv();
-            cout<<"m2="<<m2<<endl;
+            cout<<"recv m2="<<m2<<endl;
             record(m2);
         }
         else
