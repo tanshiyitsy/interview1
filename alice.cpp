@@ -138,7 +138,7 @@ void record(const Message *m)
 static int fifo = 0;
 void openfifo(){
     const char *filename = "alice_to_bob";
-    if (access(filename, F_OK))
+    while(access(filename, F_OK))
         mkfifo(filename, 0666);
     fifo = open(filename, O_WRONLY);
     assert(fifo != 0);
