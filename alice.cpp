@@ -172,7 +172,6 @@ static int recv_fifo = 0;
 // }
 void send(const Message *message)
 {
-    //static int fifo = 0;
     if (send_fifo == 0)
     {
         const char *filename = "alice_to_bob";
@@ -189,7 +188,6 @@ static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 static int messageLen = sizeof(Message);
 void recv()
 {
-    static int recv_fifo = 0;
     if (recv_fifo == 0)
     {
         const char *filename = "bob_to_alice";
