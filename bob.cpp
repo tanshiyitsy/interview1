@@ -46,7 +46,7 @@ int main()
     while (true)
     {
         const Message *m1 = recv();
-        cout<<"recv m1="<<m1<<endl;
+        //cout<<"recv m1="<<m1<<endl;
         assert(m1->checksum == crc32(m1));
         memcpy(m2, m1, m1->size); // 拷贝m1至m2
         m2->payload[0]++;         // 第一个字符加一
