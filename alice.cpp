@@ -173,7 +173,7 @@ int main()
         const Message *m1 = next_message();
         if (m1)
         {
-            cout<<"send m1="<<m1<<endl;
+            std::cout<<"send m1="<<m1<<std::endl;
             send(m1);
             const Message *m2 = recv();
             cout<<"recv m2="<<m2<<endl;
