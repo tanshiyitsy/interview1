@@ -137,39 +137,7 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static int send_fifo = 0;
 static int recv_fifo = 0;
-// void send(const Message *message)
-// {
-//     //static int fifo = 0;
-//     if (send_fifo == 0)
-//     {
-//         const char *filename = "alice_to_bob";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-// 	send_fifo = open(filename, O_WRONLY);
-// 	cout << "send_fifo=" << send_fifo << endl;
-//         assert(send_fifo != 0);
-//     }
-//     assert(write(send_fifo, message, message->size) == message->size);
-// }
 
-// static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-// const Message *recv()
-// {
-//     static int recv_fifo = 0;
-//     if (recv_fifo == 0)
-//     {
-//         const char *filename = "bob_to_alice";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-// 	recv_fifo = open(filename, O_RDONLY);
-// 	cout << "recv_fifo=" << recv_fifo << endl;
-//         assert(recv_fifo != 0);
-//     }
-//     //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-//     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
-//     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
-//     return m;
-// }
 void send(const Message *message)
 {
     if (send_fifo == 0)
@@ -197,7 +165,6 @@ void recv()
 	cout << "recv_fifo=" << recv_fifo << endl;
         assert(recv_fifo != 0);
     }
-    //static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, messageLen) == messageLen);
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
 }
@@ -212,14 +179,11 @@ int main()
         m1 = next_message();
         if (m1)
         {
-             //memcpy(m, m1, m1->size);
-            //std::cout<<"alice send m1="<<m1<<std::endl;
+            std::cout<<"alice send m1="<<m1<<std::endl;
             send(m1);
-// 	    const Message *m2 = recv();
-//             record(m2);
             recv();
 	    record(m);
-	    //std::cout<<"alice recv m="<<m<<std::endl;
+	    std::cout<<"alice recv m="<<m<<std::endl;
         }
         else
         {
