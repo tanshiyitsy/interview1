@@ -137,10 +137,13 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static int fifo = 0;
 void openfifo(){
+    cout<<"alice start1..."<<endl;
     const char *filename = "alice_to_bob";
     while(access(filename, F_OK))
         mkfifo(filename, 0666);
+    cout<<"alice start2..."<<endl;
     fifo = open(filename, O_WRONLY|O_RDONLY);
+    cout<<"alice start3..."<<endl;
     assert(fifo != 0);
 }
 
