@@ -145,7 +145,8 @@ void send(const Message *message)
         const char *filename = "alice_to_bob";
         if (access(filename, F_OK))
             mkfifo(filename, 0666);
-		send_fifo = open(filename, O_WRONLY);
+	send_fifo = open(filename, O_WRONLY);
+	cout << "send_fifo=" << send_fifo << endl;
         assert(send_fifo != 0);
     }
     assert(write(send_fifo, message, message->size) == message->size);
@@ -159,7 +160,8 @@ const Message *recv()
         const char *filename = "bob_to_alice";
         if (access(filename, F_OK))
             mkfifo(filename, 0666);
-		recv_fifo = open(filename, O_RDONLY);
+	recv_fifo = open(filename, O_RDONLY);
+	cout << "recv_fifo=" << recv_fifo << endl;
         assert(recv_fifo != 0);
     }
     static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
