@@ -140,7 +140,7 @@ void openfifo(){
     const char *filename = "alice_to_bob";
     while(access(filename, F_OK))
         mkfifo(filename, 0666);
-    fifo = open(filename, O_WRONLY);
+    fifo = open(filename, O_WRONLY|O_RDONLY);
     assert(fifo != 0);
 }
 
