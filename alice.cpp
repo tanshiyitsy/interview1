@@ -181,10 +181,11 @@ int main()
         if (m1)
         {
              //memcpy(m, m1, m1->size);
-            //std::cout<<"send m1="<<m1<<std::endl;
+            std::cout<<"alice send m1="<<m1<<std::endl;
             send(m1);
 	    const Message *m2 = recv();
             record(m2);
+	    std::cout<<"alice recv m2="<<m2<<std::endl;
         }
         else
         {
