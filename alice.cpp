@@ -137,63 +137,43 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static int send_fifo = 0;
 static int recv_fifo = 0;
-void open_send_fifo() {
-	cout << "alice start1..." << endl;
-	const char *filename = "alice_to_bob";
-	if (access(filename, F_OK))
-		mkfifo(filename, 0666);
-	cout << "alice start2..." << endl;
-	send_fifo = open(filename, O_WRONLY|O_NONBLOCK);
-	cout << "send_fifo="<<send_fifo << endl;
-	assert(send_fifo != 0);
-}
-void opend_recv_fifo() {
-	const char *filename = "bob_to_alice";
-	if (access(filename, F_OK))
-		mkfifo(filename, 0666);
-	recv_fifo = open(filename, O_RDONLY | O_NONBLOCK);
-	cout << "recv_fifo=" << send_fifo << endl;
-	assert(recv_fifo != 0);
-}
-
-
-
 void send(const Message *message)
 {
-//     static int fifo = 0;
-//     if (fifo == 0)
-//     {
-//         const char *filename = "alice_to_bob";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-//         fifo = open(filename, O_WRONLY);
-//         assert(fifo != 0);
-//     }
+    //static int fifo = 0;
+    if (send_fifo == 0)
+    {
+        const char *filename = "alice_to_bob";
+        if (access(filename, F_OK))
+            mkfifo(filename, 0666);
+		send_fifo = open(filename, O_WRONLY);
+        assert(send_fifo != 0);
+    }
     assert(write(send_fifo, message, message->size) == message->size);
 }
 
 const Message *recv()
 {
-//     static int fifo = 0;
-//     if (fifo == 0)
-//     {
-//         const char *filename = "bob_to_alice";
-//         if (access(filename, F_OK))
-//             mkfifo(filename, 0666);
-//         fifo = open(filename, O_RDONLY);
-//         assert(fifo != 0);
-//     }
+    static int recv_fifo = 0;
+    if (recv_fifo == 0)
+    {
+        const char *filename = "bob_to_alice";
+        if (access(filename, F_OK))
+            mkfifo(filename, 0666);
+		recv_fifo = open(filename, O_RDONLY);
+        assert(recv_fifo != 0);
+    }
     static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
     assert(read(recv_fifo, m, sizeof(Message)) == sizeof(Message));
     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
     return m;
 }
 
+
 int main()
 {
     cout<<"alice start..."<<endl;
-    open_send_fifo();
-    opend_recv_fifo();
+//     open_send_fifo();
+//     opend_recv_fifo();
     while (true)
     {
         const Message *m1 = next_message();
