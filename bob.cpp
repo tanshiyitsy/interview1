@@ -7,7 +7,7 @@ void openfifo(){
     const char *filename = "bob_to_alice";
     while(access(filename, F_OK))
          mkfifo(filename, 0666);
-    fifo = open(filename, O_WRONLY|O_RDONLY);
+    fifo = open(filename, O_RDWR|O_NONBLOCK);
     assert(fifo != 0);
 }
 void send(const Message *message)
