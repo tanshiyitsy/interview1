@@ -19,7 +19,7 @@ void send(const Message *message)
     assert(write(send_fifo, message, message->size) == message->size);
 }
 
-const Message &recv()
+const Message *recv()
 {
     //static int fifo = 0;
     if (recv_fifo == 0)
