@@ -4,20 +4,20 @@ using namespace std;
 
 static int send_fifo = 0;
 static int recv_fifo = 0;
-void send(const Message *message)
-{
-    //static int send_fifo = 0;
-    if (send_fifo == 0)
-    {
-        const char *filename = "bob_to_alice";
-        if (access(filename, F_OK))
-            mkfifo(filename, 0666);
-	send_fifo = open(filename, O_WRONLY);
-	cout << "send_fifo=" << send_fifo << endl;
-        assert(send_fifo != 0);
-    }
-    assert(write(send_fifo, message, message->size) == message->size);
-}
+// void send(const Message *message)
+// {
+//     //static int send_fifo = 0;
+//     if (send_fifo == 0)
+//     {
+//         const char *filename = "bob_to_alice";
+//         if (access(filename, F_OK))
+//             mkfifo(filename, 0666);
+// 	send_fifo = open(filename, O_WRONLY);
+// 	cout << "send_fifo=" << send_fifo << endl;
+//         assert(send_fifo != 0);
+//     }
+//     assert(write(send_fifo, message, message->size) == message->size);
+// }
 
 // const Message &recv()
 // {
@@ -36,6 +36,20 @@ void send(const Message *message)
 //     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
 //     return m;
 // }
+void send()
+{
+    //static int send_fifo = 0;
+    if (send_fifo == 0)
+    {
+        const char *filename = "bob_to_alice";
+        if (access(filename, F_OK))
+            mkfifo(filename, 0666);
+	send_fifo = open(filename, O_WRONLY);
+	cout << "send_fifo=" << send_fifo << endl;
+        assert(send_fifo != 0);
+    }
+    assert(write(send_fifo, m, m->size) == m->size);
+}
 static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 void recv()
 {
