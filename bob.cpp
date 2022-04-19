@@ -36,6 +36,7 @@ static int recv_fifo = 0;
 //     assert(read(recv_fifo, m->payload, m->payload_size()) == m->payload_size());
 //     return m;
 // }
+static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
 void send()
 {
     //static int send_fifo = 0;
@@ -50,7 +51,7 @@ void send()
     }
     assert(write(send_fifo, m, m->size) == m->size);
 }
-static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
+
 void recv()
 {
     //static int fifo = 0;
