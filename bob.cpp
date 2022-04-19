@@ -10,7 +10,7 @@ void open_send_fifo() {
 	if (access(filename, F_OK))
 		mkfifo(filename, 0666);
 	cout << "alice start2..." << endl;
-	send_fifo = open(filename, O_WRONLY);
+	send_fifo = open(filename, O_WRONLY | O_NONBLOCK);
 	cout << "send_fifo=" << send_fifo << endl;
 	assert(send_fifo != 0);
 }
@@ -18,7 +18,7 @@ void opend_recv_fifo() {
 	const char *filename = "alice_to_bob";
 	if (access(filename, F_OK))
 		mkfifo(filename, 0666);
-	recv_fifo = open(filename, O_RDONLY);
+	recv_fifo = open(filename, O_RDONLY | O_NONBLOCK);
 	cout << "recv_fifo=" << send_fifo << endl;
 	assert(recv_fifo != 0);
 }
