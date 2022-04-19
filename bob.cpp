@@ -86,7 +86,7 @@ int main()
 	recv();
 	m->payload[0]++;
 	m->checksum = crc32(m2);
-        send(m);
+        send();
     }
 
     return 0;
