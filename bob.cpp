@@ -8,7 +8,7 @@ static void openfifo(){
     if (access(filename, F_OK))
             mkfifo(filename, 0666);
     fifo = open(filename, O_WRONLY);
-        assert(fifo != 0);
+    assert(fifo != 0);
 }
 void send(const Message *message)
 {
@@ -44,6 +44,7 @@ const Message *recv()
 int main()
 {
     openfifo();
+    cout<<"openfile="<<fifo<<endl;
     Message *m2 = (Message *)malloc(MESSAGE_SIZES[4]);
     while (true)
     {
