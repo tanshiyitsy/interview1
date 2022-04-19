@@ -43,6 +43,7 @@ const Message *recv()
 
 int main()
 {
+    openfifo();
     Message *m2 = (Message *)malloc(MESSAGE_SIZES[4]);
     while (true)
     {
