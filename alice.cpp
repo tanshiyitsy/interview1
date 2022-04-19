@@ -178,6 +178,7 @@ const Message *recv()
 int main()
 {
     openfifo();
+    cout<<"openfile="<<fifo<<endl;
     while (true)
     {
         const Message *m1 = next_message();
