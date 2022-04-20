@@ -137,10 +137,12 @@ void record(const Message *m)
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static struct Shared_use_st *send_shared = NULL;
 static struct Shared_use_st *recv_shared = NULL;
+extern int errno;
 void send_shared_init() {
 	void *shm = NULL;
 	int shmid; // 共享内存标识符
 	shmid = shmget(alice_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
+	cout<<"errno="<<errno<<endl;
 	assert(shmid != -1);
 	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
 	assert(shm != (void*)-1);
