@@ -137,7 +137,6 @@ void record(const Message *m)
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 static struct Shared_use_st *send_shared = NULL;
-static struct Shared_use_st *recv_shared = NULL;
 extern int errno;
 void send_shared_init() {
 	void *shm = NULL;
@@ -161,7 +160,7 @@ void recv() {
     for (int i = 0; i < BUFFER_N; i++) {
 		// 消费item
 		if (send_shared->status[i] == 2) {
-			recv_msg = (Message *)recv_shared->buffer[i];
+			recv_msg = (Message *)send_shared->buffer[i];
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
 			record(recv_msg);
