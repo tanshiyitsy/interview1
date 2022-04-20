@@ -17,11 +17,10 @@ const Message *recv_msg;
 int main() {
 	cout << "bob start..." << endl;
 	recv_shared_init();
-	while (true) {
-// 	    recv();	
+	while (true) {	
 	    for (int i = 0; i < BUFFER_N; i++) {
 			// 消费item
-		         std::cout << "bob loop:" << i << std::endl;
+		         //std::cout << "bob loop:" << i << std::endl;
 			if (recv_shared->status[i] == 1) {
 				recv_msg = (Message *)recv_shared->buffer[i];
 // 				std::cout << "bob recv:" << recv_msg->payload << std::endl;
