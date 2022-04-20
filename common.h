@@ -137,8 +137,8 @@ struct Shared_use_st { // 缓冲池结构
 	int status[BUFFER_N];
 	//std::mutex mtx; // 用互斥锁
 };
-key_t alice_send_shared = 12;
-key_t bob_send_shared = 17;
+key_t alice_send_shared = 212;
+key_t bob_send_shared = 217;
 
 
 
