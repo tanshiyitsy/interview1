@@ -178,9 +178,7 @@ void send(){
 			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
 			std::cout << "alice send:" << send_msg<< std::endl;
 			//std::cout << "alice send:" << send_msg->payload << std::endl;
-			//send_shared->mtx.lock();
 			send_shared->status[i] = 1;
-			//send_shared->mtx.unlock();
 			send_msg = next_message();
 			break;
 		}
@@ -191,13 +189,14 @@ int main()
 {
 	cout << "alice start..." << endl;
 	send_shared_init();
+	send_msg = next_message();
 	while (true) {
 		if (send_msg) {
 		    send();
 		}
 		else
 		{
-			recv(); // 等待的时候可以收消息
+// 			recv(); // 等待的时候可以收消息
 			time_t dt = now() - test_cases.front().first;
 			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
 			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
