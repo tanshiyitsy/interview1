@@ -30,37 +30,33 @@ void send_shared_init() {
 	//sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
 }
-//static Message *recv_msg = (Message *)malloc(MESSAGE_SIZES[4]);
+
 const Message *recv_msg;
-//const Message *send_msg;
+
 void send() {
 	while (true) {
-		//assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
-		//send_shared->mtx.lock();
-		if (send_shared->status[send_shared->write_pos] == 0) {
+		int cur_pos = send_shared->write_pos;
+		if (send_shared->status[cur_pos] == 0) {
 			//send_shared->mtx.unlock();
 			
-			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size);
+			memcpy(send_shared->buffer[cur_pos], recv_msg, recv_msg->size);
 			//std::cout << "bob send:" << ((Message *)send_shared->buffer[send_shared->write_pos])->payload << std::endl;
 			
 			send_shared->mtx.lock();
-			send_shared->status[send_shared->write_pos] = 1;
-			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
+			send_shared->status[cur_pos] = 1;
+			send_shared->write_pos = (cur_pos + 1) % BUFFER_N;
 			//sem_post(&(send_shared->sem)); // 释放信号量
 			send_shared->mtx.unlock();
 			break;
 		}
-		
-		// 不能生产
-		//send_shared->mtx.unlock();
-		//sem_post(&(send_shared->sem)); // 释放信号量
 	}
 }
 void recv() {
 	while (true) {
 		//assert(sem_wait(&(recv_shared->sem)) != -1);
 		//recv_shared->mtx.lock();
-		if (recv_shared->status[recv_shared->read_pos] == 1) {
+		int cur_pos = recv_shared->read_pos;
+		if (recv_shared->status[cur_pos] == 1) {
 			// 消费该消息
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			//std::cout << "bob recv:" << recv_msg->payload << std::endl;
@@ -74,13 +70,9 @@ void recv() {
 			send();
 			//recv_shared->mtx.lock();
 			recv_shared->mtx.lock();
-			recv_shared->status[recv_shared->read_pos] = 0;
-			recv_shared->read_pos = (recv_shared->read_pos+1) % BUFFER_N;
+			recv_shared->status[cur_pos] = 0;
+			recv_shared->read_pos = (cur_pos+1) % BUFFER_N;
 			recv_shared->mtx.unlock();
-		}
-		else {
-			//recv_shared->mtx.unlock();
-		      //sem_post(&(recv_shared->sem)); // 释放信号量
 		}
 	}
 }
