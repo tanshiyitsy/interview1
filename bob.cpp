@@ -64,7 +64,7 @@ void recv() {
 				Message *temp = const_cast<Message *>(recv_msg);
 				temp->payload[0]++;
 				temp->checksum = crc32(temp);
-				
+				std::cout << "bob recv:" << recv_msg << std::endl;
 				recv_shared->buffer[next] = NULL;
 				recv_shared->read_pos = next;
 				send();
