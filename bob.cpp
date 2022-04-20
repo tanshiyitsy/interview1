@@ -65,3 +65,8 @@ void recv() {
 		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
 }
+int main() {
+	cout << "bob start..." << endl;
+	recv();
+	return 0;
+}
