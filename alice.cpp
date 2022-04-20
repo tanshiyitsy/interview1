@@ -169,18 +169,21 @@ void recv_shared_init() {
 
 const Message *recv_msg;
 void recv() {
-    int cur_pos = recv_shared->read_pos;
-    if (recv_shared->status[cur_pos] == 1) {
-		// 消费item
-		recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-		std::cout << "alice recv:" << recv_msg->payload << std::endl;
+    while(true){
+    
+	    int cur_pos = recv_shared->read_pos;
+	    if (recv_shared->status[cur_pos] == 1) {
+			// 消费item
+			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
+			std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
-		record(recv_msg);
-		recv_shared->mtx.lock();
-		recv_shared->status[cur_pos] = 0;
-		recv_shared->read_pos = (cur_pos + 1) % BUFFER_N;
-		recv_shared->mtx.unlock();
-	}
+			record(recv_msg);
+			recv_shared->mtx.lock();
+			recv_shared->status[cur_pos] = 0;
+			recv_shared->read_pos = (cur_pos + 1) % BUFFER_N;
+			recv_shared->mtx.unlock();
+		}
+    }
 }
 const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
