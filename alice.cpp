@@ -182,6 +182,7 @@ void recv() {
 			recv_shared->status[cur_pos] = 0;
 			recv_shared->read_pos = (cur_pos + 1) % BUFFER_N;
 			recv_shared->mtx.unlock();
+		    	break;
 		}
     }
 }
