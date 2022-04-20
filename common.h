@@ -139,7 +139,7 @@ struct Shared_use_st { // 缓冲池结构
 	int read_pos; // 消费者读取位置
 	int write_pos; // 生产者写入位置
 	// sem_t sem;
-	mutex mtx; // 用互斥锁
+	std::mutex mtx; // 用互斥锁
 	//condition_variable can_consume;
 	// condition_variable can_produce;
 };
