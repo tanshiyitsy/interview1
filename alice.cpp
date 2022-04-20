@@ -175,7 +175,7 @@ void recv() {
 	    if (recv_shared->status[cur_pos] == 1) {
 			// 消费item
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-			std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
 			record(recv_msg);
 			recv_shared->mtx.lock();
