@@ -201,6 +201,7 @@ void recv() {
 			recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			if (recv_msg) {
 				record(recv_msg);
+				std::cout << "alice recv:" << recv_msg << std::endl;
 				recv_shared->buffer[recv_shared->read_pos] = NULL;
 				recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 			}
