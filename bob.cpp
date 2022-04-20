@@ -40,7 +40,7 @@ void send() {
 			break;
 		}
 		// 不能生产
-		sem_post(&(send_shared->sem); // 释放信号量
+		sem_post(&(send_shared->sem)); // 释放信号量
 	}
 }
 //static Message *recv_msg = (Message *)malloc(MESSAGE_SIZES[4]);
@@ -58,6 +58,6 @@ void recv() {
 			recv_msg->checksum = crc32(recv_msg);
 			send();
 		}
-		sem_post(&(recv_shared->sem); // 释放信号量
+		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
 }
