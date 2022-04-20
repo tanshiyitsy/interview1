@@ -12,7 +12,7 @@ void recv_shared_init() {
 	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
 	assert(shm != (void*)-1);
 	recv_shared = (struct Shared_use_st*)shm;
-	recv_shared->read_pos = 0;
+	recv_shared->read_pos = -1;
 }
 void send_shared_init() {
 	void *shm = NULL;
@@ -51,9 +51,11 @@ void send() {
 void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
-		if (recv_shared->read_pos != recv_shared->write_pos) {
+		int next = (recv_shared->read_pos + 1) % BUFFER_N;
+		if (next != recv_shared->write_pos) {
 			// 消费该消息
-			recv_msg = recv_shared->buffer[recv_shared->read_pos];
+			//recv_msg = recv_shared->buffer[recv_shared->read_pos];
+			recv_msg = recv_shared->buffer[next];
 			if (recv_msg != NULL) {
 				std::cout << "bob recv:" << recv_msg << std::endl;
 				assert(recv_msg->checksum == crc32(recv_msg));
@@ -63,7 +65,7 @@ void recv() {
 				// 			recv_msg->payload[0]++;
 				// 			recv_msg->checksum = crc32(recv_msg);
 				recv_shared->buffer[recv_shared->read_pos] = NULL;
-				recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
+				recv_shared->read_pos = next;
 				send();
 			}
 		}
