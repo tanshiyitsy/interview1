@@ -204,7 +204,7 @@ void recv() {
 			recv_msg = recv_shared->buffer[next];
 			record(recv_msg);
 			std::cout << "alice recv:" << recv_msg << std::endl;
-			recv_shared->buffer[recv_shared->read_pos] = NULL;
+			recv_shared->buffer[next] = NULL;
 			recv_shared->read_pos = next;
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
