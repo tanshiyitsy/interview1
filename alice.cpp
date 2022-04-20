@@ -135,86 +135,84 @@ void record(const Message *m)
 }
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
-static int send_fifo = 0;
-static int recv_fifo = 0;
-static const Message *m1 = nullptr;
-static int payload_size = 0;
-void sendfirst()
-{
-    const char *filename = "alice_to_bob";
-	if (access(filename, F_OK))
-	    mkfifo(filename, 0666);
-	send_fifo = open(filename, O_WRONLY);
-	cout << "send_fifo=" << send_fifo << endl;
-	assert(send_fifo != 0);
-    assert(write(send_fifo, m1, m1->size) == m1->size);
+static struct Shared_use_st *send_shared = NULL;
+static struct Shared_use_st *recv_shared = NULL;
+void send_shared_init() {
+	void *shm = NULL;
+	int shmid; // 共享内存标识符
+	shmid = shmget(alice_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
+	assert(shmid != -1);
+	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
+	assert(shm != (void*)-1);
+	send_shared = (struct Shared_use_st*)shm;
+	// 初始化缓冲池
+	for (int i = 0; i < BUFFER_N; i++) {
+		send_shared->buffer[i] = NULL;
+	}
+	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
+	send_shared->write_pos= 0;
 }
-inline void send()
-{
-    assert(write(send_fifo, m1, m1->size) == m1->size);
+void recv_shared_init() {
+	void *shm = NULL;
+	int shmid; // 共享内存标识符
+	shmid = shmget(bob_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
+	assert(shmid != -1);
+	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
+	assert(shm != (void*)-1);
+	recv_shared = (struct Shared_use_st*)shm;
+	recv_shared->read_pos = -1;
 }
-
-static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-static int messageLen = sizeof(Message);
-inline void recv()
-{
-    assert(read(recv_fifo, m, messageLen) == messageLen);
-    payload_size = m->payload_size();
-    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+const Message *send_msg = NULL;
+// 生产是直接生产再+1， 初始化为0
+// 消费是先加一，再消费，初始化为-1
+void send() {
+	while (true) {
+		send_msg = next_message();
+		if (send_msg) {
+			while (true) {
+				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
+				// 生产item到cur
+				if (send_shared->write_pos != send_shared->read_pos) {
+					send_shared->buffer[send_shared->write_pos] = send_msg;
+					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
+					sem_post(&(send_shared->sem); // 释放信号量
+					break;
+				}
+				// 不能生产
+				sem_post(&(send_shared->sem); // 释放信号量
+			}
+		}
+		else
+		{
+			time_t dt = now() - test_cases.front().first;
+			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
+			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
+		}
+	}
+	
 }
-void recvfirst()
-{
-    const char *filename = "bob_to_alice";
-	if (access(filename, F_OK))
-	    mkfifo(filename, 0666);
-	recv_fifo = open(filename, O_RDONLY);
-	cout << "recv_fifo=" << recv_fifo << endl;
-	assert(recv_fifo != 0);
-    assert(read(recv_fifo, m, messageLen) == messageLen);
-    payload_size = m->payload_size();
-    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+static Message *recv_msg;
+void recv() {
+	while (true) {
+		assert(sem_wait(&(recv_shared->sem)) != -1);
+		if (recv_shared->read_pos != recv_shared->write_pos) {
+			// 消费item
+			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
+			recv_msg = recv_shared->buffer[recv_shared->read_pos];
+			record(recv_msg);
+			recv_shared->buffer[recv_shared->read_pos] = NULL;
+		}
+		sem_post(&(recv_shared->sem); // 释放信号量
+	}
 }
-
-
 int main()
 {
-    cout<<"alice start..."<<endl;
-    while(true){
-    	m1 = next_message();
-        if (m1)
-        {
-            //std::cout<<"alice send m1="<<m1<<std::endl;
-	    sendfirst();
-            recvfirst();
-	    record(m);
-	    //std::cout<<"alice recv m="<<m<<std::endl;
-	    break;
-        }
-        else
-        {
-            time_t dt = now() - test_cases.front().first;
-            timespec req = {dt / SECOND_TO_NANO, dt % SECOND_TO_NANO}, rem;
-            nanosleep(&req, &rem); // 等待到下一条消息的发送时间
-        }
-    }
-    while (true)
-    {
-        m1 = next_message();
-        if (m1)
-        {
-            //std::cout<<"alice send m1="<<m1<<std::endl;
-	    send();
-            recv();
-	    record(m);
-	    //std::cout<<"alice recv m="<<m<<std::endl;
-        }
-        else
-        {
-            time_t dt = now() - test_cases.front().first;
-            timespec req = {dt / SECOND_TO_NANO, dt % SECOND_TO_NANO}, rem;
-            nanosleep(&req, &rem); // 等待到下一条消息的发送时间
-        }
-    }
+	// 两个线程，一个生产，一个消费
+	cout << "alice start..." << endl;
+	thread producer(send());
+	thread consumer(recv());
+	producer.join();
+	consumer.join();
 
-    return 0;
+	return 0;
 }
