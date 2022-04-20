@@ -209,8 +209,8 @@ int main()
 {
 	// 两个线程，一个生产，一个消费
 	cout << "alice start..." << endl;
-	thread producer(send());
-	thread consumer(recv());
+	thread producer(send);
+	thread consumer(recv);
 	producer.join();
 	consumer.join();
 
