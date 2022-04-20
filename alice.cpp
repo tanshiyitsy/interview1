@@ -164,9 +164,9 @@ void recv() {
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
 			record(recv_msg);
-			recv_shared->mtx.lock();
-			recv_shared->status[i] = 0;
-			recv_shared->mtx.unlock();
+			send_shared->mtx.lock();
+			send_shared->status[i] = 0;
+			send_shared->mtx.unlock();
 		}
 	}
 }
