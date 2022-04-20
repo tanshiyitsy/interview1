@@ -147,7 +147,7 @@ void send_shared_init() {
 	send_shared = (struct Shared_use_st*)shm;
 	// 初始化缓冲池
 	for (int i = 0; i < BUFFER_N; i++) {
-		send_shared->buffer[i] = NULL;
+		send_shared->status[i] = 0;
 	}
 	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
@@ -172,10 +172,11 @@ void send() {
 			while (true) {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 															 // 生产item到cur
-				if (send_shared->buffer[send_shared->write_pos] == NULL) {
+				if (send_shared->status[send_shared->write_pos] == 0) {
 					//send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)
 					std::cout << "alice send:" << send_msg << std::endl;
-					send_shared->buffer[send_shared->write_pos] = send_msg;
+					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
+					send_shared->status[send_shared->write_pos] = 1;
 					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 					sem_post(&(send_shared->sem)); // 释放信号量
 					break;
@@ -198,13 +199,13 @@ void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		int next = (recv_shared->read_pos + 1) % BUFFER_N;
-		if (recv_shared->buffer[next] != NULL) {
+		if (recv_shared->status[next] == 1) {
 			// next != recv_shared->write_pos && recv_shared->buffer[next] != NULL
 			// 消费item
 			recv_msg = recv_shared->buffer[next];
 			record(recv_msg);
-			std::cout << "alice recv:" << recv_msg << std::endl;
-			recv_shared->buffer[next] = NULL;
+			std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			recv_shared->status[next] = 0;
 			recv_shared->read_pos = next;
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
