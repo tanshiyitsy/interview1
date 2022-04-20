@@ -159,6 +159,7 @@ const Message *recv_msg;
 void recv() {
     for (int i = 0; i < BUFFER_N; i++) {
 		// 消费item
+	       std::cout << "alice recv loop:" << i << std::endl;
 		if (send_shared->status[i] == 2) {
 			recv_msg = (Message *)send_shared->buffer[i];
 			std::cout << "alice recv:" << i << std::endl;
@@ -173,6 +174,7 @@ const Message *send_msg = NULL;
 void send(){
 	for (int i = 0; i < BUFFER_N; i++) {
 		// 生产item
+		std::cout << "alice send loop:" << i << std::endl;
 		if (send_shared->status[i] == 0) {
 			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
 			std::cout << "alice send:" << i<< std::endl;
