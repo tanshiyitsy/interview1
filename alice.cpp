@@ -177,6 +177,7 @@ void send() {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 			        // 生产item到cur
 				if (send_shared->status[send_shared->write_pos] == 0) {
+					send_num++;
 					std::cout << "alice send:" << send_msg->payload << std::endl;
 					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
 					send_shared->status[send_shared->write_pos] = 1;
@@ -186,7 +187,6 @@ void send() {
 				}
 				// 不能生产
 				sem_post(&(send_shared->sem)); // 释放信号量
-				send_num++;
 			}
 		}
 		else
