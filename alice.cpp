@@ -1,7 +1,7 @@
 #include "common.h"
 #include "iostream"
 using namespace std;
-int isExit = fasle;
+int isExit = false;
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 
 /*
