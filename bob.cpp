@@ -40,7 +40,7 @@ void send() {
 		if (send_shared->status[send_shared->write_pos] == 0) {
 			std::cout << "bob send:" << recv_msg->payload << std::endl;
 			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size);
-			std::cout << "bob send:" << (Message *)(send_shared->buffer[send_shared->write_pos])->payload << std::endl;
+			std::cout << "bob send:" << ((Message *)send_shared->buffer[send_shared->write_pos])->payload << std::endl;
 			send_shared->status[send_shared->write_pos] = 1;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 			sem_post(&(send_shared->sem)); // 释放信号量
