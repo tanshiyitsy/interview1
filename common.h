@@ -143,8 +143,8 @@ struct Shared_use_st { // 缓冲池结构
 	//condition_variable can_consume;
 	// condition_variable can_produce;
 };
-key_t alice_send_shared = 1121;
-key_t bob_send_shared = 1122;
+key_t alice_send_shared = 23;
+key_t bob_send_shared = 24;
 
 
 
