@@ -169,15 +169,13 @@ const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
 // 消费是先加一，再消费，初始化为-1
 void send() {
-	int send_num = 0;
-	while (send_num <= 5) {
+	while (true) {
 		send_msg = next_message();
 		if (send_msg) {
 			while (true) {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 			        // 生产item到cur
 				if (send_shared->status[send_shared->write_pos] == 0) {
-					send_num++;
 					std::cout << "alice send:" << send_msg->payload << std::endl;
 					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
 					send_shared->status[send_shared->write_pos] = 1;
