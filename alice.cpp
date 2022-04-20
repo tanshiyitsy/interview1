@@ -165,9 +165,7 @@ void recv() {
 			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 			
 			record(recv_msg);
-			//send_shared->mtx.lock();
 			send_shared->status[i] = 0;
-			//send_shared->mtx.unlock();
 		}
 	}
 }
@@ -184,7 +182,6 @@ void send(){
 			break;
 		}
 	}
-	recv(); // 没有进入for循环，此时没有空的了
 }
 int main()
 {
@@ -194,6 +191,7 @@ int main()
 	while (true) {
 		if (send_msg) {
 		    send();
+		    recv();
 		}
 		else
 		{
