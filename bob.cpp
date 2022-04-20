@@ -25,7 +25,7 @@ void send_shared_init() {
 	// 初始化缓冲池
 	for (int i = 0; i < BUFFER_N; i++) {
 		send_shared->status[i] = 0;
-		//send_shared->buffer[i] = (Message *)malloc(MESSAGE_SIZES[4]);
+		memset(send_shared->buffer[i],0,LEN);
 	}
 	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
