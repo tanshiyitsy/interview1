@@ -162,7 +162,7 @@ void recv_shared_init() {
 	recv_shared = (struct Shared_use_st*)shm;
 	recv_shared->read_pos = -1;
 }
-Message *send_msg = NULL;
+const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
 // 消费是先加一，再消费，初始化为-1
 void send() {
