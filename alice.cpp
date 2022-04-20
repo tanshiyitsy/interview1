@@ -203,7 +203,7 @@ void recv() {
 		if (recv_shared->status[next] == 1) {
 			// next != recv_shared->write_pos && recv_shared->buffer[next] != NULL
 			// 消费item
-			recv_msg = recv_shared->buffer[next];
+			recv_msg = (Message *)recv_shared->buffer[next];
 			record(recv_msg);
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
 			recv_shared->status[next] = 0;
