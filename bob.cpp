@@ -38,7 +38,7 @@ void send() {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 
 		if (send_shared->status[send_shared->write_pos] == 0) {
-			std::cout << "bob send:" << recv_msg << std::endl;
+			std::cout << "bob send:" << recv_msg->payload << std::endl;
 			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size);
 			send_shared->status[send_shared->write_pos] = 1;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
@@ -61,8 +61,7 @@ void recv() {
 			//std::cout << "bob const recv to pointer"<< std::endl;
 			temp->payload[0]++;
 			temp->checksum = crc32(temp);
-
-			std::cout << "bob recv:" << recv_msg << std::endl;
+			
 			send();
 			recv_shared->status[recv_shared->read_pos] = 0;
 			recv_shared->read_pos = (recv_shared->read_pos+1) % BUFFER_N;
