@@ -206,8 +206,8 @@ int main()
 	send_shared_init();
 	send_msg = next_message();
 	while (true) {
-		std::cout << "send_msg:" << send_msg<< std::endl;
 		if (send_msg) {
+	            std::cout << "send_msg:" << send_msg<< std::endl;
 		    send();
 		    recv();
 		}
