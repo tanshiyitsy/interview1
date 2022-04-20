@@ -36,7 +36,7 @@ void send() {
 	while (true) {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 													 // 生产item到cur
-		if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL) {
+		if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)) {
 			// 			send_shared->buffer[send_shared->write_pos] = send_msg;
 			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
