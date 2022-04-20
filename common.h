@@ -130,14 +130,14 @@ long crc32(const Message *message)
 }
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
-const int BUFFER_N = 30;
+const int BUFFER_N = 1;
 const int LEN = MESSAGE_SIZES[4];
 struct Shared_use_st { // 缓冲池结构
 	char buffer[BUFFER_N][LEN];
 	int status[BUFFER_N];
 	//std::mutex mtx; // 用互斥锁
 };
-key_t alice_send_shared = 5212;
+key_t alice_send_shared = 123;
 
 
 
