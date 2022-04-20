@@ -56,8 +56,10 @@ void recv() {
 			recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			assert(recv_msg->checksum == crc32(recv_msg));
 			Message *temp = const_cast<Message *>(recv_msg);
-			recv_msg->payload[0]++;
-			recv_msg->checksum = crc32(recv_msg);
+			temp->payload[0]++;
+			temp->checksum = src32(temp);
+// 			recv_msg->payload[0]++;
+// 			recv_msg->checksum = crc32(recv_msg);
 			send();
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
