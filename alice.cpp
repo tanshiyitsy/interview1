@@ -171,6 +171,7 @@ const Message *send_msg = NULL;
 void send() {
 	int send_num = 0;
 	while (send_num++ <= 5) {
+		std::cout<<"send_num="<<send_num<<std::endl;
 		send_msg = next_message();
 		if (send_msg) {
 			while (true) {
