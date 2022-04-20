@@ -169,19 +169,17 @@ void recv_shared_init() {
 
 const Message *recv_msg;
 void recv() {
-	while (true) {
-		if (recv_shared->status[recv_shared->read_pos] == 1) {
-			// 消费item
-			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-			std::cout << "alice recv:" << recv_msg->payload << std::endl;
-			
-			record(recv_msg);
-			recv_shared->mtx.lock();
-			recv_shared->status[recv_shared->read_pos] = 0;
-			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
-			recv_shared->mtx.unlock();
-			break;
-		}
+    int cur_pos = recv_shared->read_pos;
+    if (recv_shared->status[cur_pos] == 1) {
+		// 消费item
+		recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
+		std::cout << "alice recv:" << recv_msg->payload << std::endl;
+
+		record(recv_msg);
+		recv_shared->mtx.lock();
+		recv_shared->status[cur_pos] = 0;
+		recv_shared->read_pos = (cur_pos + 1) % BUFFER_N;
+		recv_shared->mtx.unlock();
 	}
 }
 const Message *send_msg = NULL;
@@ -195,20 +193,18 @@ void send() {
 				//assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 				//send_shared->mtx.lock();
 			        // 生产item到cur
-				if (send_shared->status[send_shared->write_pos] == 0) {
+				int cur_pos = send_shared->write_pos; // 用临时变量, cache friendly
+				if (send_shared->status[cur_pos] == 0) {
 					//std::cout << "alice send:" << send_msg->payload << std::endl;
-					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
+					memcpy(send_shared->buffer[cur_pos], send_msg, send_msg->size);
 					
 					send_shared->mtx.lock();
-					send_shared->status[send_shared->write_pos] = 1;
-					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
+					send_shared->status[cur_pos] = 1;
+					send_shared->write_pos = (cur_pos + 1) % BUFFER_N;
 					send_shared->mtx.unlock();
 					//sem_post(&(send_shared->sem)); // 释放信号量
 					break;
 				}
-				// 不能生产
-				//send_shared->mtx.unlock();
-				//sem_post(&(send_shared->sem)); // 释放信号量
 			}
 			recv();
 		}
