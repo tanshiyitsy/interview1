@@ -191,7 +191,7 @@ void send() {
 	}
 	
 }
-static Message *recv_msg;
+const Message *recv_msg;
 void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
