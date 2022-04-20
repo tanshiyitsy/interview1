@@ -154,7 +154,6 @@ void send_shared_init() {
 		memset(send_shared->buffer[i],0,LEN);
 	}
 	//sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
-	send_shared->write_pos = 0;
 }
 
 const Message *recv_msg;
@@ -162,8 +161,8 @@ void recv() {
     for (int i = 0; i < BUFFER_N; i++) {
 		// 消费item
 		if (send_shared->status[i] == 2) {
-			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			recv_msg = (Message *)recv_shared->buffer[i];
+			std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
 			record(recv_msg);
 			recv_shared->mtx.lock();
