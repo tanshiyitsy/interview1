@@ -29,12 +29,16 @@ void send_shared_init() {
 	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
 }
+//static Message *recv_msg = (Message *)malloc(MESSAGE_SIZES[4]);
+const Message *recv_msg;
+//const Message *send_msg;
 void send() {
 	while (true) {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 		// 生产item到cur
 		if (send_shared->write_pos != send_shared->read_pos) {
-			send_shared->buffer[send_shared->write_pos] = send_msg;
+// 			send_shared->buffer[send_shared->write_pos] = send_msg;
+			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 			sem_post(&(send_shared->sem); // 释放信号量
 			break;
@@ -43,9 +47,6 @@ void send() {
 		sem_post(&(send_shared->sem)); // 释放信号量
 	}
 }
-//static Message *recv_msg = (Message *)malloc(MESSAGE_SIZES[4]);
-Message *recv_msg;
-int consume_index = 0;
 void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
