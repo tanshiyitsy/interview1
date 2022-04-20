@@ -38,6 +38,7 @@ void send() {
 													 // 生产item到cur
 		if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)) {
 			// 			send_shared->buffer[send_shared->write_pos] = send_msg;
+			std::cout << "bob send:" << recv_msg << std::endl;
 			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 			sem_post(&(send_shared->sem)); // 释放信号量
@@ -54,6 +55,7 @@ void recv() {
 			// 消费该消息
 			recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			if (recv_msg != NULL) {
+				std::cout << "bob recv:" << recv_msg << std::endl;
 				assert(recv_msg->checksum == crc32(recv_msg));
 				Message *temp = const_cast<Message *>(recv_msg);
 				temp->payload[0]++;
