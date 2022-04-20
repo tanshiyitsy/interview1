@@ -27,9 +27,9 @@ void recv() {
 
 			//std::cout << "temp" << temp->payload << std::endl;
 			//send(); // 直接在共享内存改了
-			recv_shared->mtx.lock();
+			//recv_shared->mtx.lock();
 			recv_shared->status[i] = 2;
-			recv_shared->mtx.unlock();
+			//recv_shared->mtx.unlock();
 		}
 	}
 }
