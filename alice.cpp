@@ -197,7 +197,7 @@ int main()
 		}
 		else
 		{
-// 			recv(); // 等待的时候可以收消息
+			recv(); // 等待的时候可以收消息
 			time_t dt = now() - test_cases.front().first;
 			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
 			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
