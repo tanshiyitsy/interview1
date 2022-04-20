@@ -203,8 +203,9 @@ void recv() {
 		if (recv_shared->status[recv_shared->read_pos] == 1) {
 			// 消费item
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-			record(recv_msg);
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			
+			record(recv_msg);
 			recv_shared->status[recv_shared->read_pos] = 0;
 			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 		}
