@@ -169,7 +169,8 @@ const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
 // 消费是先加一，再消费，初始化为-1
 void send() {
-	while (true) {
+	int send_num = 0;
+	while (send_num++ <= 5) {
 		send_msg = next_message();
 		if (send_msg) {
 			while (true) {
