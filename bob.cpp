@@ -63,12 +63,14 @@ void recv() {
 			temp->payload[0]++;
 			temp->checksum = crc32(temp);
 			std::cout << "temp payload"<< temp->payload<<std::endl;
-			
+			sem_post(&(recv_shared->sem)); // 释放信号量,死锁
 			send();
 			recv_shared->status[recv_shared->read_pos] = 0;
 			recv_shared->read_pos = (recv_shared->read_pos+1) % BUFFER_N;
 		}
-		sem_post(&(recv_shared->sem)); // 释放信号量
+		else {
+		      sem_post(&(recv_shared->sem)); // 释放信号量
+		}
 	}
 }
 int main() {
