@@ -168,6 +168,8 @@ void recv() {
 		//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 		record(recv_msg);
 		send_shared->status[i] = 0;
+	}else if(send_shared->status[i] == 1){
+	     recvIndex.emplace(i);
 	}
     }
 }
@@ -182,6 +184,7 @@ void send(){
 			//std::cout << "alice send:" << send_msg->payload << std::endl;
 			send_shared->status[i] = 1;
 			send_msg = next_message();
+			recvIndex.emplace(i);
 			recv();
 			return;
 		}
