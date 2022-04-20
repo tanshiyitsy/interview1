@@ -36,7 +36,7 @@ void send() {
 	while (true) {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 													 // 生产item到cur
-		if (send_shared->write_pos != send_shared->read_pos) {
+		if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL) {
 			// 			send_shared->buffer[send_shared->write_pos] = send_msg;
 			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
@@ -54,13 +54,16 @@ void recv() {
 			// 消费该消息
 			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 			recv_msg = recv_shared->buffer[recv_shared->read_pos];
-			assert(recv_msg->checksum == crc32(recv_msg));
-			Message *temp = const_cast<Message *>(recv_msg);
-			temp->payload[0]++;
-			temp->checksum = crc32(temp);
-			// 			recv_msg->payload[0]++;
-			// 			recv_msg->checksum = crc32(recv_msg);
-			send();
+			if (recv_msg != NULL) {
+				assert(recv_msg->checksum == crc32(recv_msg));
+				Message *temp = const_cast<Message *>(recv_msg);
+				temp->payload[0]++;
+				temp->checksum = crc32(temp);
+				// 			recv_msg->payload[0]++;
+				// 			recv_msg->checksum = crc32(recv_msg);
+				recv_shared->buffer[recv_shared->read_pos] = NULL;
+				send();
+			}
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
