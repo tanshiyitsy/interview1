@@ -26,6 +26,7 @@
 #include "mutex"
 #include <sys/types.h>
 #include "condition_variable"
+#include "thread"
 int BUFFER_N = 5;
 struct Shared_use_st { // 缓冲池结构
 					   // char buffer[BUFFER_N][MESSAGE_SIZES[4]+1];
