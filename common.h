@@ -133,15 +133,9 @@ long crc32(const Message *message)
 const int BUFFER_N = 2;
 const int LEN = MESSAGE_SIZES[4];
 struct Shared_use_st { // 缓冲池结构
-					   // char buffer[BUFFER_N][MESSAGE_SIZES[4]+1];
 	char buffer[BUFFER_N][LEN];
 	int status[BUFFER_N];
-	int read_pos; // 消费者读取位置
-	int write_pos; // 生产者写入位置
-	// sem_t sem;
 	std::mutex mtx; // 用互斥锁
-	//condition_variable can_consume;
-	// condition_variable can_produce;
 };
 key_t alice_send_shared = 123;
 key_t bob_send_shared = 124;
