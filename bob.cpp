@@ -43,11 +43,11 @@ void send() {
 			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size);
 			//std::cout << "bob send:" << ((Message *)send_shared->buffer[send_shared->write_pos])->payload << std::endl;
 			
-			//send_shared->mtx.lock();
+			send_shared->mtx.lock();
 			send_shared->status[send_shared->write_pos] = 1;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 			//sem_post(&(send_shared->sem)); // 释放信号量
-			//send_shared->mtx.unlock();
+			send_shared->mtx.unlock();
 			break;
 		}
 		
@@ -73,9 +73,10 @@ void recv() {
 			//sem_post(&(recv_shared->sem)); // 释放信号量,死锁
 			send();
 			//recv_shared->mtx.lock();
+			recv_shared->mtx.lock();
 			recv_shared->status[recv_shared->read_pos] = 0;
 			recv_shared->read_pos = (recv_shared->read_pos+1) % BUFFER_N;
-			//recv_shared->mtx.unlock();
+			recv_shared->mtx.unlock();
 		}
 		else {
 			//recv_shared->mtx.unlock();
