@@ -54,7 +54,7 @@ void recv() {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		if (recv_shared->status[recv_shared->read_pos] == 1) {
 			// 消费该消息
-			recv_msg = (Message *)recv_shared->buffer[next];
+			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			std::cout << "bob recv:" << recv_msg->payload << std::endl;
 			assert(recv_msg->checksum == crc32(recv_msg));
 			Message *temp = const_cast<Message *>(recv_msg);
