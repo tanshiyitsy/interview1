@@ -175,11 +175,11 @@ void send() {
 				if (send_shared->write_pos != send_shared->read_pos) {
 					send_shared->buffer[send_shared->write_pos] = send_msg;
 					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
-					sem_post(&(send_shared->sem); // 释放信号量
+					sem_post(&(send_shared->sem)); // 释放信号量
 					break;
 				}
 				// 不能生产
-				sem_post(&(send_shared->sem); // 释放信号量
+				sem_post(&(send_shared->sem)); // 释放信号量
 			}
 		}
 		else
@@ -202,7 +202,7 @@ void recv() {
 			record(recv_msg);
 			recv_shared->buffer[recv_shared->read_pos] = NULL;
 		}
-		sem_post(&(recv_shared->sem); // 释放信号量
+		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
 }
 int main()
