@@ -6,7 +6,7 @@ TARGETS=alice bob
 all: ${TARGETS}
 
 %: %.cpp common.h
-	${CC} ${CFLAGS} $< -o $@
+	${CC} ${CFLAGS} $< -o $@ -lpthread
 
 clean:
 	rm -f ${TARGETS}
