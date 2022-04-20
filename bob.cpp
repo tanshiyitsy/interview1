@@ -19,7 +19,7 @@ void recv() {
 		// 消费item
 		if (recv_shared->status[i] == 1) {
 			recv_msg = (Message *)recv_shared->buffer[i];
-			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			std::cout << "bob recv:" << recv_msg->payload << std::endl;
 			assert(recv_msg->checksum == crc32(recv_msg));
 			Message *temp = const_cast<Message *>(recv_msg);
 			temp->payload[0]++;
