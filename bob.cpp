@@ -52,7 +52,7 @@ void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		int next = (recv_shared->read_pos + 1) % BUFFER_N;
-		if (next != recv_shared->write_pos) {
+		if (next != recv_shared->write_pos && recv_shared->buffer[next] != NULL) {
 			// 消费该消息
 			//recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			recv_msg = recv_shared->buffer[next];
