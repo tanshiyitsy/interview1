@@ -40,7 +40,7 @@ void send() {
 // 			send_shared->buffer[send_shared->write_pos] = send_msg;
 			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
-			sem_post(&(send_shared->sem); // 释放信号量
+			sem_post(&(send_shared->sem)); // 释放信号量
 			break;
 		}
 		// 不能生产
@@ -53,8 +53,9 @@ void recv() {
 		if (recv_shared->read_pos != recv_shared->write_pos) {
 			// 消费该消息
 			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
-			recv_msg = recv_shared->buffer[consume_index];
+			recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			assert(recv_msg->checksum == crc32(recv_msg));
+			Message *temp = const_cast<Message *>(recv_msg);
 			recv_msg->payload[0]++;
 			recv_msg->checksum = crc32(recv_msg);
 			send();
