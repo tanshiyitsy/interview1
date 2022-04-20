@@ -178,7 +178,7 @@ void send() {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 			        // 生产item到cur
 				if (send_shared->status[send_shared->write_pos] == 0) {
-					std::cout << "alice send:" << send_msg->payload << std::endl;
+					//std::cout << "alice send:" << send_msg->payload << std::endl;
 					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
 					send_shared->status[send_shared->write_pos] = 1;
 					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
