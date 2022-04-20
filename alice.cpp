@@ -200,7 +200,9 @@ const Message *recv_msg;
 void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
+		std::cout << "alice recv get sem" << std::endl;
 		if (recv_shared->status[recv_shared->read_pos] == 1) {
+			std::cout << "alice recv status = 1" << std::endl;
 			// 消费item
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
