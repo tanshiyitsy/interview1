@@ -19,6 +19,27 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "semaphore.h"
+#include "sys/ipc.h"
+#include "sys/shm.h"
+#include "fcntl.h"
+#include "mutex"
+#include <sys/types.h>
+#include "condition_variable"
+int BUFFER_N = 5;
+struct Shared_use_st { // 缓冲池结构
+					   // char buffer[BUFFER_N][MESSAGE_SIZES[4]+1];
+	Message *buffer[BUFFER_N];
+	int read_pos; // 消费者读取位置
+	int write_pos; // 生产者写入位置
+	sem_t sem;
+	// mutex mtx; // 用互斥锁
+	//condition_variable can_consume;
+	// condition_variable can_produce;
+};
+key_t alice_send_shared = 1121;
+key_t bob_send_shared = 1122;
+
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 
 constexpr time_t MICRO_TO_NANO = 1000;
