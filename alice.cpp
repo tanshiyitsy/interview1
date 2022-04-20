@@ -1,6 +1,7 @@
 #include "common.h"
 #include "iostream"
 using namespace std;
+int isExit = fasle;
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 
 /*
@@ -88,6 +89,7 @@ const Message *next_message()
 		for (auto d : delays)
 			s2 += (d - mean) * (d - mean);
 		double std = sqrt(s2 / delays.size());
+		isExit = true;
 		printf("n=%zu median=%.0fns mean=%.0fns std=%.0fns 95%%=%.0fns 99%%=%.0fns maximum=%.0fns\n", delays.size(), median, mean, std, p95, p99, maximum);
 		exit(0);
 	}
@@ -198,11 +200,9 @@ void send() {
 }
 const Message *recv_msg;
 void recv() {
-	while (true) {
+	while (!isExit) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
-		std::cout << "alice recv get sem" << std::endl;
 		if (recv_shared->status[recv_shared->read_pos] == 1) {
-			std::cout << "alice recv status = 1" << std::endl;
 			// 消费item
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
