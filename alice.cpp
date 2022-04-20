@@ -170,7 +170,7 @@ const Message *send_msg = NULL;
 // 消费是先加一，再消费，初始化为-1
 void send() {
 	int send_num = 0;
-	while (send_num++ <= 5) {
+	while (send_num <= 5) {
 		std::cout<<"send_num="<<send_num<<std::endl;
 		send_msg = next_message();
 		if (send_msg) {
@@ -187,6 +187,7 @@ void send() {
 				}
 				// 不能生产
 				sem_post(&(send_shared->sem)); // 释放信号量
+				send_num++;
 			}
 		}
 		else
