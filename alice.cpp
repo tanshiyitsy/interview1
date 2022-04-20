@@ -162,11 +162,11 @@ void recv() {
 		if (send_shared->status[i] == 2) {
 			recv_msg = (Message *)send_shared->buffer[i];
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
-
+			
 			record(recv_msg);
-			send_shared->mtx.lock();
+			//send_shared->mtx.lock();
 			send_shared->status[i] = 0;
-			send_shared->mtx.unlock();
+			//send_shared->mtx.unlock();
 		}
 	}
 }
@@ -176,9 +176,9 @@ void send(){
 		// 生产item
 		if (send_shared->status[i] == 0) {
 			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
-			send_shared->mtx.lock();
+			//send_shared->mtx.lock();
 			send_shared->status[i] = 1;
-			send_shared->mtx.unlock();
+			//send_shared->mtx.unlock();
 			send_msg = next_message();
 			return;
 		}
