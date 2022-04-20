@@ -163,7 +163,7 @@ void recv_shared_init() {
 	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
 	assert(shm != (void*)-1);
 	recv_shared = (struct Shared_use_st*)shm;
-	recv_shared->read_pos = -1;
+	recv_shared->read_pos = 0;
 }
 const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
@@ -176,8 +176,7 @@ void send() {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 															 // 生产item到cur
 				if (send_shared->status[send_shared->write_pos] == 0) {
-					//send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)
-					std::cout << "alice send:" << send_msg << std::endl;
+					std::cout << "alice send:" << send_msg->payload << std::endl;
 					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
 					send_shared->status[send_shared->write_pos] = 1;
 					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
@@ -201,15 +200,13 @@ const Message *recv_msg;
 void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
-		int next = (recv_shared->read_pos + 1) % BUFFER_N;
-		if (recv_shared->status[next] == 1) {
-			// next != recv_shared->write_pos && recv_shared->buffer[next] != NULL
+		if (recv_shared->status[recv_shared->read_pos] == 1) {
 			// 消费item
-			recv_msg = (Message *)recv_shared->buffer[next];
+			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			record(recv_msg);
 			std::cout << "alice recv:" << recv_msg->payload << std::endl;
-			recv_shared->status[next] = 0;
-			recv_shared->read_pos = next;
+			recv_shared->status[recv_shared->read_pos] = 0;
+			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
