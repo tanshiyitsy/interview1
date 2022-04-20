@@ -157,6 +157,16 @@ void send_shared_init() {
 
 const Message *recv_msg;
 queue<int> recvIndex;
+void recvALL(){
+    for(int i = 0;i < BUFFER_N;i++){
+	if (send_shared->status[i] == 2) {
+		recv_msg = (Message *)send_shared->buffer[i];
+		std::cout << "alice recvall:" << i << std::endl;
+		record(recv_msg);
+		send_shared->status[i] = 0;
+	}
+    }
+}
 void recv() {
     while(!recvIndex.empty()){
         // 消费item
@@ -188,6 +198,7 @@ void send(){
 			return;
 		}
 	}
+	recvALL();
 }
 int main()
 {
@@ -202,7 +213,6 @@ int main()
 		}
 		else
 		{
-			//recv(); // 等待的时候可以收消息
 			time_t dt = now() - test_cases.front().first;
 			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
 			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
