@@ -156,77 +156,53 @@ void send_shared_init() {
 	//sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
 }
-void recv_shared_init() {
-	void *shm = NULL;
-	int shmid; // 共享内存标识符
-	shmid = shmget(bob_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
-	assert(shmid != -1);
-	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
-	assert(shm != (void*)-1);
-	recv_shared = (struct Shared_use_st*)shm;
-	recv_shared->read_pos = 0;
-}
 
 const Message *recv_msg;
 void recv() {
-    while(true){
-    
-	    int cur_pos = recv_shared->read_pos;
-	    if (recv_shared->status[cur_pos] == 1) {
-			// 消费item
+    for (int i = 0; i < BUFFER_N; i++) {
+		// 消费item
+		if (send_shared->status[i] == 2) {
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
 			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 
 			record(recv_msg);
 			recv_shared->mtx.lock();
-			recv_shared->status[cur_pos] = 0;
-			recv_shared->read_pos = (cur_pos + 1) % BUFFER_N;
+			recv_shared->status[i] = 0;
 			recv_shared->mtx.unlock();
-		    	break;
-		}
-    }
-}
-const Message *send_msg = NULL;
-// 生产是直接生产再+1， 初始化为0
-// 消费是先加一，再消费，初始化为-1
-void send() {
-	while (true) {
-		send_msg = next_message();
-		if (send_msg) {
-			while (true) {
-				//assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
-				//send_shared->mtx.lock();
-			        // 生产item到cur
-				int cur_pos = send_shared->write_pos; // 用临时变量, cache friendly
-				if (send_shared->status[cur_pos] == 0) {
-					//std::cout << "alice send:" << send_msg->payload << std::endl;
-					memcpy(send_shared->buffer[cur_pos], send_msg, send_msg->size);
-					
-					send_shared->mtx.lock();
-					send_shared->status[cur_pos] = 1;
-					send_shared->write_pos = (cur_pos + 1) % BUFFER_N;
-					send_shared->mtx.unlock();
-					//sem_post(&(send_shared->sem)); // 释放信号量
-					break;
-				}
-			}
-			recv();
-		}
-		else
-		{
-			time_t dt = now() - test_cases.front().first;
-			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
-			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
 		}
 	}
-
 }
-
+const Message *send_msg = NULL;
+void send(){
+	for (int i = 0; i < BUFFER_N; i++) {
+		// 生产item
+		if (send_shared->status[i] == 0) {
+			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
+			send_shared->mtx.lock();
+			send_shared->status[i] = 1;
+			send_shared->mtx.unlock();
+			send_msg = next_message();
+			return;
+		}
+	}
+	recv(); // 没有进入for循环，此时没有空的了
+}
 int main()
 {
 	cout << "alice start..." << endl;
 	send_shared_init();
-	recv_shared_init();
-	send();
+	while (true) {
+		if (send_msg) {
+		    send();
+		}
+		else
+		{
+			recv(); // 等待的时候可以收消息
+			time_t dt = now() - test_cases.front().first;
+			timespec req = { dt / SECOND_TO_NANO, dt % SECOND_TO_NANO }, rem;
+			nanosleep(&req, &rem); // 等待到下一条消息的发送时间
+			send_msg = next_message();
+		}
+	}
 	return 0;
 }
