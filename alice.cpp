@@ -160,7 +160,7 @@ void recv_shared_init() {
 	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
 	assert(shm != (void*)-1);
 	recv_shared = (struct Shared_use_st*)shm;
-	recv_shared->read_pos = -1;
+	recv_shared->read_pos = 0;
 }
 const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
@@ -198,11 +198,11 @@ void recv() {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		if (recv_shared->read_pos != recv_shared->write_pos) {
 			// 消费item
-			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 			recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			if (recv_msg) {
 				record(recv_msg);
 				recv_shared->buffer[recv_shared->read_pos] = NULL;
+				recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
 			}
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
