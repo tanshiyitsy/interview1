@@ -181,7 +181,7 @@ void send(){
 			send_shared->status[i] = 1;
 			//send_shared->mtx.unlock();
 			send_msg = next_message();
-			return;
+			break;
 		}
 	}
 	recv(); // 没有进入for循环，此时没有空的了
