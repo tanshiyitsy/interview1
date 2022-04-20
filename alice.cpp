@@ -172,7 +172,7 @@ void send() {
 			while (true) {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
 															 // 生产item到cur
-				if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] != NULL)) {
+				if (send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)) {
 					std::cout << "alice send:" << send_msg << std::endl;
 					send_shared->buffer[send_shared->write_pos] = send_msg;
 					send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
@@ -197,15 +197,13 @@ void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		int next = (recv_shared->read_pos + 1) % BUFFER_N;
-		if (next != recv_shared->write_pos) {
+		if (next != recv_shared->write_pos && recv_shared->buffer[next] != NULL) {
 			// 消费item
 			recv_msg = recv_shared->buffer[next];
-			if (recv_msg) {
-				record(recv_msg);
-				std::cout << "alice recv:" << recv_msg << std::endl;
-				recv_shared->buffer[recv_shared->read_pos] = NULL;
-				recv_shared->read_pos = next;
-			}
+			record(recv_msg);
+			std::cout << "alice recv:" << recv_msg << std::endl;
+			recv_shared->buffer[recv_shared->read_pos] = NULL;
+			recv_shared->read_pos = next;
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
