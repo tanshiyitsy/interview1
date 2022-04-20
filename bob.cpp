@@ -19,16 +19,13 @@ void recv() {
 	for (int i = 0; i < BUFFER_N; i++) {
 	// 消费item
 	if (send_shared->status[i] == 1) {
-		recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
+		recv_msg = (Message *)recv_shared->buffer[i];
 		//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 		assert(recv_msg->checksum == crc32(recv_msg));
-// 		Message *temp = const_cast<Message *>(recv_msg);
-			
-// 		temp->payload[0]++;
-// 		temp->checksum = crc32(temp);
+		Message *temp = const_cast<Message *>(recv_msg);
+		temp->payload[0]++;
+		temp->checksum = crc32(temp);
 		
-		recv_msg->payload[0]++;
-		recv_msg->checksum = crc32(temp);
 		//send(); // 直接在共享内存改了
 		recv_shared->mtx.lock();
 		recv_shared->status[i] = 2;
