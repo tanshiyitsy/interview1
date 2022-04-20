@@ -161,7 +161,7 @@ void recv() {
 		// 消费item
 		if (send_shared->status[i] == 2) {
 			recv_msg = (Message *)send_shared->buffer[i];
-			std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
 			
 			record(recv_msg);
 			//send_shared->mtx.lock();
