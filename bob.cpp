@@ -2,63 +2,62 @@
 #include "iostream"
 using namespace std;
 
-static int send_fifo = 0;
-static int recv_fifo = 0;
-static Message *m = (Message *)malloc(MESSAGE_SIZES[4]);
-static int messageLen = sizeof(Message);
-static int payload_size = 0;
-inline void send()
-{
-    assert(write(send_fifo, m, m->size) == m->size);
+static struct Shared_use_st *recv_shared = NULL;
+static struct Shared_use_st *send_shared = NULL;
+void recv_shared_init() {
+	void *shm = NULL;
+	int shmid; // 共享内存标识符
+	shmid = shmget(alice_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
+	assert(shmid != -1);
+	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
+	assert(shm != (void*)-1);
+	recv_shared = (struct Shared_use_st*)shm;
+	recv_shared->read_pos = -1;
 }
-void sendfirst()
-{
-    const char *filename = "bob_to_alice";
-	if (access(filename, F_OK))
-	    mkfifo(filename, 0666);
-	send_fifo = open(filename, O_WRONLY);
-	cout << "send_fifo=" << send_fifo << endl;
-	assert(send_fifo != 0);
-    assert(write(send_fifo, m, m->size) == m->size);
+void send_shared_init() {
+	void *shm = NULL;
+	int shmid; // 共享内存标识符
+	shmid = shmget(bob_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
+	assert(shmid != -1);
+	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
+	assert(shm != (void*)-1);
+	send_shared = (struct Shared_use_st*)shm;
+	// 初始化缓冲池
+	for (int i = 0; i < BUFFER_N; i++) {
+		send_shared->buffer[i] = NULL;
+	}
+	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
+	send_shared->write_pos = 0;
 }
-void recvfirst()
-{
-    const char *filename = "alice_to_bob";
-	if (access(filename, F_OK))
-	    mkfifo(filename, 0666);
-	recv_fifo = open(filename, O_RDONLY);
-	cout << "recv_fifo=" << recv_fifo << endl;
-	assert(recv_fifo != 0);
-    assert(read(recv_fifo, m, messageLen) == messageLen);
-    payload_size = m->payload_size();
-    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
+void send() {
+	while (true) {
+		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
+		// 生产item到cur
+		if (send_shared->write_pos != send_shared->read_pos) {
+			send_shared->buffer[send_shared->write_pos] = send_msg;
+			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
+			sem_post(&(send_shared->sem); // 释放信号量
+			break;
+		}
+		// 不能生产
+		sem_post(&(send_shared->sem); // 释放信号量
+	}
 }
-inline void recv()
-{
-    assert(read(recv_fifo, m, messageLen) == messageLen);
-    payload_size = m->payload_size();
-    assert(read(recv_fifo, m->payload, payload_size) == payload_size);
-}
-
-int main()
-{
-    cout<<"bob start..."<<endl;
-     recvfirst();
-    assert(m->checksum == crc32(m));
-	m->payload[0]++;         // 第一个字符加一
-	m->checksum = crc32(m); // 更新校验和
-	sendfirst();
-
-    while (true)
-    {
-	recv();
-	//cout<<"bob recv"<<m<<endl;
-        assert(m->checksum == crc32(m));
-        m->payload[0]++;         // 第一个字符加一
-        m->checksum = crc32(m); // 更新校验和
-	send();
-	//cout<<"bob send"<<m<<endl;
-    }
-
-    return 0;
+//static Message *recv_msg = (Message *)malloc(MESSAGE_SIZES[4]);
+Message *recv_msg;
+int consume_index = 0;
+void recv() {
+	while (true) {
+		assert(sem_wait(&(recv_shared->sem)) != -1);
+		if (recv_shared->read_pos != recv_shared->write_pos) {
+			// 消费该消息
+			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
+			recv_msg = recv_shared->buffer[consume_index];
+			assert(recv_msg->checksum == crc32(recv_msg));
+			recv_msg->payload[0]++;
+			recv_msg->checksum = crc32(recv_msg);
+			send();
+		}
+		sem_post(&(recv_shared->sem); // 释放信号量
+	}
 }
