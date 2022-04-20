@@ -156,19 +156,20 @@ void send_shared_init() {
 }
 
 const Message *recv_msg;
+queue<int> recvIndex;
 void recv() {
-    for (int i = 0; i < BUFFER_N; i++) {
-		// 消费item
-	       std::cout << "alice recv loop:" << i << std::endl;
-		if (send_shared->status[i] == 2) {
-			recv_msg = (Message *)send_shared->buffer[i];
-			std::cout << "alice recv:" << i << std::endl;
-			//std::cout << "alice recv:" << recv_msg->payload << std::endl;
-			
-			record(recv_msg);
-			send_shared->status[i] = 0;
-		}
+    while(!recvIndex.empty()){
+        // 消费item
+	int i = recvIndex.front();
+	recvIndex.pop();
+	if (send_shared->status[i] == 2) {
+		recv_msg = (Message *)send_shared->buffer[i];
+		std::cout << "alice recv:" << i << std::endl;
+		//std::cout << "alice recv:" << recv_msg->payload << std::endl;
+		record(recv_msg);
+		send_shared->status[i] = 0;
 	}
+    }
 }
 const Message *send_msg = NULL;
 void send(){
@@ -181,9 +182,11 @@ void send(){
 			//std::cout << "alice send:" << send_msg->payload << std::endl;
 			send_shared->status[i] = 1;
 			send_msg = next_message();
-			break;
+			recv();
+			return;
 		}
 	}
+	recv();
 }
 int main()
 {
@@ -193,7 +196,7 @@ int main()
 	while (true) {
 		if (send_msg) {
 		    send();
-		    recv();
+		    //recv();
 		}
 		else
 		{
