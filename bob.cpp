@@ -35,22 +35,27 @@ const Message *recv_msg;
 //const Message *send_msg;
 void send() {
 	while (true) {
-		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
+		//assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
+		send_shared->mtx.lock();
 		if (send_shared->status[send_shared->write_pos] == 0) {
 			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size);
 			//std::cout << "bob send:" << ((Message *)send_shared->buffer[send_shared->write_pos])->payload << std::endl;
 			send_shared->status[send_shared->write_pos] = 1;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
-			sem_post(&(send_shared->sem)); // 释放信号量
+			//sem_post(&(send_shared->sem)); // 释放信号量
+			send_shared->mtx.unlock();
 			break;
 		}
+		
 		// 不能生产
-		sem_post(&(send_shared->sem)); // 释放信号量
+		send_shared->mtx.unlock();
+		//sem_post(&(send_shared->sem)); // 释放信号量
 	}
 }
 void recv() {
 	while (true) {
-		assert(sem_wait(&(recv_shared->sem)) != -1);
+		//assert(sem_wait(&(recv_shared->sem)) != -1);
+		recv_shared->mtx.lock();
 		if (recv_shared->status[recv_shared->read_pos] == 1) {
 			// 消费该消息
 			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
@@ -61,13 +66,15 @@ void recv() {
 			temp->payload[0]++;
 			temp->checksum = crc32(temp);
 			//std::cout << "temp payload"<< temp->payload<<std::endl;
-			sem_post(&(recv_shared->sem)); // 释放信号量,死锁
+			//sem_post(&(recv_shared->sem)); // 释放信号量,死锁
+			recv_shared->mtx.unlock();
 			send();
 			recv_shared->status[recv_shared->read_pos] = 0;
 			recv_shared->read_pos = (recv_shared->read_pos+1) % BUFFER_N;
 		}
 		else {
-		      sem_post(&(recv_shared->sem)); // 释放信号量
+			recv_shared->mtx.lock();
+		      //sem_post(&(recv_shared->sem)); // 释放信号量
 		}
 	}
 }
