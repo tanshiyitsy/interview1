@@ -174,8 +174,8 @@ void recv() {
 	recvIndex.pop();
 	if (send_shared->status[i] == 2) {
 		recv_msg = (Message *)send_shared->buffer[i];
-		std::cout << "alice recv:" << i << std::endl;
-		//std::cout << "alice recv:" << recv_msg->payload << std::endl;
+// 		std::cout << "alice recv:" << i << std::endl;
+		std::cout << "alice recv:" << recv_msg->payload << std::endl;
 		record(recv_msg);
 		send_shared->status[i] = 0;
 	}else if(send_shared->status[i] == 1){
@@ -190,7 +190,7 @@ void send(){
 		//std::cout << "alice send loop:" << i << std::endl;
 		if (send_shared->status[i] == 0) {
 			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
-			std::cout << "alice send:" << i<< std::endl;
+// 			std::cout << "alice send:" << i<< std::endl;
 			// std::cout << "alice send:" << send_msg->payload << std::endl;
 			send_shared->status[i] = 1;
 			send_msg = next_message();
@@ -207,7 +207,6 @@ int main()
 	send_msg = next_message();
 	while (true) {
 		if (send_msg) {
-	            std::cout << "send_msg:" << send_msg<< std::endl;
 		    send();
 		    recv();
 		}
