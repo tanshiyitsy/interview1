@@ -142,7 +142,7 @@ void send_shared_init() {
 	void *shm = NULL;
 	int shmid; // 共享内存标识符
 	shmid = shmget(alice_send_shared, sizeof(struct Shared_use_st), 0666 | IPC_CREAT);
-	cout<<"errno="<<errno<<endl;
+// 	cout<<"errno="<<errno<<endl;
 	assert(shmid != -1);
 	shm = shmat(shmid, (void*)0, 0);        //返回共享存储段连接的实际地址
 	assert(shm != (void*)-1);
@@ -150,7 +150,7 @@ void send_shared_init() {
 	// 初始化缓冲池
 	for (int i = 0; i < BUFFER_N; i++) {
 		send_shared->status[i] = 0;
-		//send_shared->buffer[i] = (Message *)malloc(MESSAGE_SIZES[4]);
+		memset(send_shared->buffer[i],0,LEN);
 	}
 	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
@@ -175,7 +175,7 @@ void send() {
 		if (send_msg) {
 			while (true) {
 				assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
-															 // 生产item到cur
+			        // 生产item到cur
 				if (send_shared->status[send_shared->write_pos] == 0) {
 					std::cout << "alice send:" << send_msg->payload << std::endl;
 					memcpy(send_shared->buffer[send_shared->write_pos], send_msg, send_msg->size);
