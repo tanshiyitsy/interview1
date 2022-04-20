@@ -24,7 +24,7 @@ void send_shared_init() {
 	send_shared = (struct Shared_use_st*)shm;
 	// 初始化缓冲池
 	for (int i = 0; i < BUFFER_N; i++) {
-		send_shared->buffer[i] = NULL;
+		send_shared->status[i] = 0;
 	}
 	sem_init(&(send_shared->sem), 1, 1); // 信号量初始化，初始值为1
 	send_shared->write_pos = 0;
@@ -35,13 +35,12 @@ const Message *recv_msg;
 void send() {
 	while (true) {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
-													 // 生产item到cur
-		if (send_shared->buffer[send_shared->write_pos] == NULL) {
-			// send_shared->write_pos != send_shared->read_pos && (send_shared->buffer[send_shared->write_pos] == NULL)
-			// 			send_shared->buffer[send_shared->write_pos] = send_msg;
+
+		if (send_shared->status[send_shared->write_pos] == 0) {
 			std::cout << "bob send:" << recv_msg << std::endl;
-			send_shared->buffer[send_shared->write_pos] = recv_msg;
+			memcpy(send_shared->buffer[send_shared->write_pos], recv_msg, recv_msg->size());
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
+			send_shared->status[send_shared->write_pos] = 1;
 			sem_post(&(send_shared->sem)); // 释放信号量
 			break;
 		}
@@ -53,22 +52,20 @@ void recv() {
 	while (true) {
 		assert(sem_wait(&(recv_shared->sem)) != -1);
 		int next = (recv_shared->read_pos + 1) % BUFFER_N;
-		if ( recv_shared->buffer[next] != NULL) {
-			// next != recv_shared->write_pos && recv_shared->buffer[next] != NULL
+		if (recv_shared->status[next] == 1) {
 			// 消费该消息
-			//recv_msg = recv_shared->buffer[recv_shared->read_pos];
 			recv_msg = recv_shared->buffer[next];
-			if (recv_msg != NULL) {
-				std::cout << "bob recv:" << recv_msg << std::endl;
-				assert(recv_msg->checksum == crc32(recv_msg));
-				Message *temp = const_cast<Message *>(recv_msg);
-				temp->payload[0]++;
-				temp->checksum = crc32(temp);
-				std::cout << "bob recv:" << recv_msg << std::endl;
-				recv_shared->buffer[next] = NULL;
-				recv_shared->read_pos = next;
-				send();
-			}
+			std::cout << "bob recv:" << recv_msg << std::endl;
+			assert(recv_msg->checksum == crc32(recv_msg));
+			Message *temp = const_cast<Message *>(recv_msg);
+			//std::cout << "bob const recv to pointer"<< std::endl;
+			temp->payload[0]++;
+			temp->checksum = crc32(temp);
+
+			std::cout << "bob recv:" << recv_msg << std::endl;
+			send();
+			recv_shared->status[next] = NULL;
+			recv_shared->read_pos = next;
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
 	}
