@@ -1,7 +1,7 @@
 #include "common.h"
 #include "iostream"
 using namespace std;
-int isExit = false;
+
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
 
 /*
@@ -89,7 +89,6 @@ const Message *next_message()
 		for (auto d : delays)
 			s2 += (d - mean) * (d - mean);
 		double std = sqrt(s2 / delays.size());
-		isExit = true;
 		printf("n=%zu median=%.0fns mean=%.0fns std=%.0fns 95%%=%.0fns 99%%=%.0fns maximum=%.0fns\n", delays.size(), median, mean, std, p95, p99, maximum);
 		exit(0);
 	}
@@ -167,6 +166,24 @@ void recv_shared_init() {
 	recv_shared = (struct Shared_use_st*)shm;
 	recv_shared->read_pos = 0;
 }
+
+const Message *recv_msg;
+void recv() {
+	while (true) {
+		if (recv_shared->status[recv_shared->read_pos] == 1) {
+			// 消费item
+			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
+			std::cout << "alice recv:" << recv_msg->payload << std::endl;
+			
+			record(recv_msg);
+			recv_shared->mtx.lock();
+			recv_shared->status[recv_shared->read_pos] = 0;
+			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
+			recv_shared->mtx.unlock();
+			break;
+		}
+	}
+}
 const Message *send_msg = NULL;
 // 生产是直接生产再+1， 初始化为0
 // 消费是先加一，再消费，初始化为-1
@@ -193,6 +210,7 @@ void send() {
 				//send_shared->mtx.unlock();
 				//sem_post(&(send_shared->sem)); // 释放信号量
 			}
+			recv();
 		}
 		else
 		{
@@ -203,37 +221,12 @@ void send() {
 	}
 
 }
-const Message *recv_msg;
-void recv() {
-	while (!isExit) {
-		//assert(sem_wait(&(recv_shared->sem)) != -1);
-		//recv_shared->mtx.lock();
-		if (recv_shared->status[recv_shared->read_pos] == 1) {
-			// 消费item
-			recv_msg = (Message *)recv_shared->buffer[recv_shared->read_pos];
-			std::cout << "alice recv:" << recv_msg->payload << std::endl;
-			
-			record(recv_msg);
-			
-			recv_shared->mtx.lock();
-			recv_shared->status[recv_shared->read_pos] = 0;
-			recv_shared->read_pos = (recv_shared->read_pos + 1) % BUFFER_N;
-			recv_shared->mtx.unlock();
-		}
-		//sem_post(&(recv_shared->sem)); // 释放信号量
-		//recv_shared->mtx.unlock();
-	}
-}
+
 int main()
 {
-	// 两个线程，一个生产，一个消费
 	cout << "alice start..." << endl;
 	send_shared_init();
 	recv_shared_init();
-	thread producer(send);
-	thread consumer(recv);
-	producer.join();
-	consumer.join();
-
+	send();
 	return 0;
 }
