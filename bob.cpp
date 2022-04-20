@@ -57,7 +57,7 @@ void recv() {
 			assert(recv_msg->checksum == crc32(recv_msg));
 			Message *temp = const_cast<Message *>(recv_msg);
 			temp->payload[0]++;
-			temp->checksum = src32(temp);
+			temp->checksum = crc32(temp);
 // 			recv_msg->payload[0]++;
 // 			recv_msg->checksum = crc32(recv_msg);
 			send();
