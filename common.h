@@ -135,7 +135,7 @@ const int LEN = MESSAGE_SIZES[4];
 struct Shared_use_st { // 缓冲池结构
 	char buffer[BUFFER_N][LEN];
 	int status[BUFFER_N];
-	std::mutex mtx; // 用互斥锁
+	//std::mutex mtx; // 用互斥锁
 };
 key_t alice_send_shared = 123;
 key_t bob_send_shared = 124;
