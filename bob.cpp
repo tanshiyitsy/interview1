@@ -35,9 +35,9 @@ const Message *recv_msg;
 void send() {
 	while (true) {
 		assert(sem_wait(&(send_shared->sem)) != -1); // 获取信号量
-		// 生产item到cur
+													 // 生产item到cur
 		if (send_shared->write_pos != send_shared->read_pos) {
-// 			send_shared->buffer[send_shared->write_pos] = send_msg;
+			// 			send_shared->buffer[send_shared->write_pos] = send_msg;
 			send_shared->buffer[send_shared->write_pos] = recv_msg;
 			send_shared->write_pos = (send_shared->write_pos + 1) % BUFFER_N;
 			sem_post(&(send_shared->sem)); // 释放信号量
@@ -58,8 +58,8 @@ void recv() {
 			Message *temp = const_cast<Message *>(recv_msg);
 			temp->payload[0]++;
 			temp->checksum = crc32(temp);
-// 			recv_msg->payload[0]++;
-// 			recv_msg->checksum = crc32(recv_msg);
+			// 			recv_msg->payload[0]++;
+			// 			recv_msg->checksum = crc32(recv_msg);
 			send();
 		}
 		sem_post(&(recv_shared->sem)); // 释放信号量
@@ -67,6 +67,8 @@ void recv() {
 }
 int main() {
 	cout << "bob start..." << endl;
+	send_shared_init();
+	recv_shared_init();
 	recv();
 	return 0;
 }
