@@ -58,9 +58,10 @@ void recv() {
 			std::cout << "bob recv:" << recv_msg->payload << std::endl;
 			assert(recv_msg->checksum == crc32(recv_msg));
 			Message *temp = const_cast<Message *>(recv_msg);
-			//std::cout << "bob const recv to pointer"<< std::endl;
+			
 			temp->payload[0]++;
 			temp->checksum = crc32(temp);
+			std::cout << "temp payload"<< temp->payload<<std::endl;
 			
 			send();
 			recv_shared->status[recv_shared->read_pos] = 0;
