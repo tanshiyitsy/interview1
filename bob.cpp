@@ -14,25 +14,6 @@ void recv_shared_init() {
 }
 
 const Message *recv_msg;
-void recv() {
-	for (int i = 0; i < BUFFER_N; i++) {
-		// 消费item
-		if (recv_shared->status[i] == 1) {
-			recv_msg = (Message *)recv_shared->buffer[i];
-			//std::cout << "bob recv:" << recv_msg->payload << std::endl;
-			assert(recv_msg->checksum == crc32(recv_msg));
-			Message *temp = const_cast<Message *>(recv_msg);
-			temp->payload[0]++;
-			temp->checksum = crc32(temp);
-
-			//std::cout << "temp" << temp->payload << std::endl;
-			//send(); // 直接在共享内存改了  
-			//recv_shared->mtx.lock();
-			recv_shared->status[i] = 2;
-			//recv_shared->mtx.unlock();
-		}
-	}
-}
 int main() {
 	cout << "bob start..." << endl;
 	recv_shared_init();
@@ -40,11 +21,13 @@ int main() {
 // 	    recv();	
 	    for (int i = 0; i < BUFFER_N; i++) {
 			// 消费item
+		         std::cout << "bob loop:" << i << std::endl;
 			if (recv_shared->status[i] == 1) {
 				recv_msg = (Message *)recv_shared->buffer[i];
 // 				std::cout << "bob recv:" << recv_msg->payload << std::endl;
 				std::cout << "bob recv:" << i << std::endl;
 				assert(recv_msg->checksum == crc32(recv_msg));
+				
 				Message *temp = const_cast<Message *>(recv_msg);
 				temp->payload[0]++;
 				temp->checksum = crc32(temp);
