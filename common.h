@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include "condition_variable"
 #include "thread"
+#include "errno.h"
 
 
 /* --------------------------------------不得修改两条分割线之间的内容-------------------------------------- */
