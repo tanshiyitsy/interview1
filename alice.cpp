@@ -177,11 +177,11 @@ const Message *send_msg = NULL;
 void send(){
 	for (int i = 0; i < BUFFER_N; i++) {
 		// 生产item
-		std::cout << "alice send loop:" << i << std::endl;
+		//std::cout << "alice send loop:" << i << std::endl;
 		if (send_shared->status[i] == 0) {
 			memcpy(send_shared->buffer[i], send_msg, send_msg->size);
 			std::cout << "alice send:" << i<< std::endl;
-			//std::cout << "alice send:" << send_msg->payload << std::endl;
+			// std::cout << "alice send:" << send_msg->payload << std::endl;
 			send_shared->status[i] = 1;
 			send_msg = next_message();
 			recvIndex.emplace(i);
@@ -195,6 +195,7 @@ int main()
 	send_shared_init();
 	send_msg = next_message();
 	while (true) {
+		std::cout << "send_msg:" << send_msg<< std::endl;
 		if (send_msg) {
 		    send();
 		    recv();
